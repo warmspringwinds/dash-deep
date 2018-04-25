@@ -5,3 +5,4 @@ dash-core-components==0.22.1  # Supercharged components
 plotly
 pebble
 gpustat
+clinto # Is taken from wooey -- used to find argparse inside of any python file
