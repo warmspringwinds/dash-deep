@@ -5,4 +5,4 @@ dash-core-components==0.22.1  # Supercharged components
 plotly # Plotting library for real-time interactive loss/accuracy tracking
 pebble # Alternative process management for python. Reasons why we use it: https://stackoverflow.com/questions/42782953/python-concurrent-futures-how-to-make-it-cancelable/45565421#45565421
 gpustat # A library to query gpu memory occupation and other specs
-clinto # Is taken from wooey -- used to find argparse inside of any python file
+Flask-SQLAlchemy
