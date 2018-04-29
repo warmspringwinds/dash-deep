@@ -11,6 +11,9 @@ import gpustat
 import json
 import os
 
+import pkgutil
+import importlib
+
 from pebble import ProcessPool
 from time import sleep
 from multiprocessing import Manager
@@ -57,6 +60,20 @@ server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + database_file_location
 
 # Database object 
 db = SQLAlchemy(server)
+
+
+# In order for all our database models representing the scripts
+# to be available in db object, we need to import each module representing script
+import dash_deep.scripts
+
+for loader, name, is_pkg in pkgutil.walk_packages(dash_deep.scripts.__path__):
+    
+    full_name = dash_deep.scripts.__name__ + '.' + name
+    
+    importlib.import_module(full_name)
+    
+    print "Detected and registered a scipt {}\n".format(name)
+    
 
 # Initializing the Dash application
 
