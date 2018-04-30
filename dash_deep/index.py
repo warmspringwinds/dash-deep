@@ -10,12 +10,14 @@ from dash_deep.widjets import training_jobs_monitor
 from dash_deep.widjets import widjets_factory
 
 from dash_deep.utils import get_script_titles_and_url_endpoints
+from dash_deep.utils import generate_wtform_classes_and_input_form_widjets
 
 
 script_files_title_names, script_files_url_endpoints = get_script_titles_and_url_endpoints(scripts_db_models)
 
 main_page_scripts_widjet_layout = widjets_factory.generate_main_page_scripts_widjet(script_files_title_names, script_files_url_endpoints)
 
+wtform_classes, scripts_input_form_widjets = generate_wtform_classes_and_input_form_widjets(scripts_db_models)
 
 
 app.layout = html.Div([
@@ -50,6 +52,9 @@ def compute(n_clicks, input1):
               [dash.dependencies.Input('url', 'pathname')])
 def display_page(pathname):
     
+    # TODO: refactor this part into a special router object
+    # will be much cleaner
+    
     if pathname == '/gpu':
         
         return gpu_utilization_monitor.layout
@@ -61,6 +66,10 @@ def display_page(pathname):
     elif pathname == '/scripts':
         
         return main_page_scripts_widjet_layout
+    
+    elif pathname in script_files_url_endpoints:
+        
+        return scripts_input_form_widjets[ script_files_url_endpoints.index(pathname) ]
     
     else:
         
