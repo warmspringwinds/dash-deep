@@ -25,3 +25,32 @@ def get_script_files_basenames(script_db_models):
                                script_db_models)
     
     return script_files_basenames
+
+
+def convert_script_files_basenames_to_title_names(script_files_basenames):
+    """Converts script files basenames to title names that will be displayed to user.
+    
+    Takes name of each script, capitalizes it and replaces underscores with spaces.
+    
+    Parameters
+    ----------
+    script_files_basenames : list of script files basenames
+        list of script files basenames that can be acquired with the help of get_script_files_basenames().
+    
+    Returns
+    -------
+    script_title_names : list of strings
+        List of strings representing titles for each script.
+    """
+    
+    
+    def capitalize_and_remove_underscores(script_file_basename):
+        
+        return script_file_basename.title().replace('_', ' ')
+    
+    script_title_names = map(lambda script_file_basename: capitalize_and_remove_underscores(script_file_basename),
+                             script_files_basenames)
+    
+    return script_title_names
+    
+    
