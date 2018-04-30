@@ -52,5 +52,33 @@ def convert_script_files_basenames_to_title_names(script_files_basenames):
                              script_files_basenames)
     
     return script_title_names
+
+
+def convert_script_files_basenames_to_url_endpoints(script_files_basenames,
+                                                    parent_url_endpoint='/scripts/'):
+    """Converts script files basenames to full url endpoints.
+    
+    Takes name of each script and appends the parent_url_endpoint to it. The forms
+    for running scripts will be placed on these endpoints.
+    
+    Parameters
+    ----------
+    script_files_basenames : list of script files basenames
+        list of script files basenames that can be acquired with the help of get_script_files_basenames().
+    
+    Returns
+    -------
+    script_files_url_endpoints : list of strings
+        List of strings representing url endpoints.
+    """
+    
+    def append_parent_url_endpoint_to_script_file_basename(script_file_basename):
+        
+        return parent_url_endpoint + script_file_basename
+    
+    script_files_url_endpoints = map(lambda script_file_basename: append_parent_url_endpoint_to_script_file_basename(script_file_basename),
+                                     script_files_basenames)
+    
+    return script_files_url_endpoints
     
     
