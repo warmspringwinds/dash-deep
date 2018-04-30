@@ -1,4 +1,4 @@
-from ..app import db
+from dash_deep.app import db
 
 
 class PascalSegmentation(db.Model):
