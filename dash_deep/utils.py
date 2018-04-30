@@ -3,6 +3,34 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from dash_deep.widjets.widjets_factory import generate_widjet_from_form
 
 
+def generate_wtform_classes_and_input_form_widjets(scripts_db_models):
+    """Generates wtform classes and input form widjets for each sqlalchemy model
+    representing a script.
+    
+    Wtforms and input widjets are used together to get user input, validate it
+    and populate sqalchemy instance later on.
+    
+    Parameters
+    ----------
+    script_db_models : list of sqlalchemy classes
+        List containing sqlalchemy classes which represent each script.
+    
+    Returns
+    -------
+    script_wtform_classes : list of wtforms.ext.sqlalchemy.orm classes
+        List of classes representing wtforms for each sql models of a script.
+        
+    scripts_input_form_widjets : list of dash.html.Div instances
+        List containing the dash input forms for each script. 
+    """
+        
+    wtform_classes = generate_script_wtform_classes(scripts_db_models)
+
+    scripts_input_form_widjets = generate_scripts_input_form_widjets(wtform_classes)
+    
+    return wtform_classes, scripts_input_form_widjets
+
+
 def generate_scripts_input_form_widjets(scripts_wtform_classes):
     """Generates input form dash widjets for each wtform class representing a script.
     
