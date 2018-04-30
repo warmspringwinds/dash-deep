@@ -1,10 +1,10 @@
 
 
-def get_scripts_display_names(script_db_models):
-    """Generates display names for each sqlalchemy model class representing a script.
+def get_scripts_url_endpoints_names(script_db_models):
+    """Generates url endpoints names for each sqlalchemy model class representing a script.
     
     Extracts the script name of a file in dash_deep/scripts/ folder in which the sqlalchemy
-    model class was defined. These names are later on used on the scripts/ front page.
+    model class was defined. These names are later on used on the scripts/{endpoint} front page.
     
     Parameters
     ----------
@@ -13,15 +13,16 @@ def get_scripts_display_names(script_db_models):
     
     Returns
     -------
-    script_display_names : list of strings
+    scripts_url_endpoints_names : list of strings
         List of strings where each string represents the display name of an experiment.
+        These strings are using to create url endpoints.
     """
     
     def get_parent_module_name(class_object):
         
         return class_object.__module__.split('.')[-1]
 
-    script_display_names = map(lambda script_db_model:get_parent_module_name(script_db_model),
+    scripts_url_endpoints_names = map(lambda script_db_model:get_parent_module_name(script_db_model),
                                script_db_models)
     
-    return script_display_names
+    return scripts_url_endpoints_names
