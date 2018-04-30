@@ -3,7 +3,7 @@ from wtforms.ext.sqlalchemy.orm import model_form
 
 
 
-def generate_wtform_script_classes(scripts_db_models):
+def generate_script_wtform_classes(scripts_db_models):
     """Generates wtforms.ext.sqlalchemy.orm classes for each script database class. 
     
     As most requirements to the input fields are specified in the classes of sql
