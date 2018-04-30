@@ -1,6 +1,39 @@
 from wtforms import Form
 from wtforms.ext.sqlalchemy.orm import model_form
+from dash_deep.widjets.widjets_factory import generate_widjet_from_form
 
+
+def generate_scripts_input_form_widjets(scripts_wtform_classes):
+    """Generates input form dash widjets for each wtform class representing a script.
+    
+    By doing this we avoid code duplicating as all the name of the fields and requirements
+    are defined in the sqlalchemy model class already.
+    
+    Parameters
+    ----------
+    scripts_wtform_classes : list of wtforms.ext.sqlalchemy.orm classes
+        List containing classes representing script input form.
+    
+    Returns
+    -------
+    scripts_input_form_widjets : list of dash.html.Div instances
+        List containing the dash input forms for each script. 
+    """
+    
+    scripts_input_form_widjets = []
+    
+    for script_wtform_class in scripts_wtform_classes:
+        
+        # TODO: might do better than that
+        # Not the best way to do it but I couldn't fina another
+        # clearn way
+        wtform_class_instance = script_wtform_class()
+        
+        script_input_form_widjet = generate_widjet_from_form(wtform_class_instance)
+        
+        scripts_input_form_widjets.append(script_input_form_widjet)
+    
+    return scripts_input_form_widjets
 
 
 def generate_script_wtform_classes(scripts_db_models):
