@@ -1,4 +1,4 @@
-from app import manager, losses_arrays, process_pool, tasks, app, slow_function
+from dash_deep.app import manager, losses_arrays, process_pool, tasks, app, slow_function
 
 
 import dash_html_components as html

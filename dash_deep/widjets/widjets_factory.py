@@ -64,7 +64,7 @@ def generate_main_page_scripts_widjet(script_files_title_names, script_files_url
 
     for script_file_title, script_file_url_endpoint in zip(script_files_title_names, script_files_url_endpoints):
 
-        current_script_html_link = dcc.Link(script_files_title_names,
+        current_script_html_link = dcc.Link(script_file_title,
                                             href=script_file_url_endpoint)
 
         html_elements_list.append(current_script_html_link)

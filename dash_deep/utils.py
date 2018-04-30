@@ -80,5 +80,34 @@ def convert_script_files_basenames_to_url_endpoints(script_files_basenames,
                                      script_files_basenames)
     
     return script_files_url_endpoints
+
+
+def get_script_titles_and_url_endpoints(script_db_models):
+    """Generates titles and url endpoints for each script from its sqlalchemy model class.
+    
+    Converts sqlalchemy class for each script into title and url endpoint that will be used
+    on the front page of all scripts.
+    
+    Parameters
+    ----------
+    script_db_models : list of sqlalchemy classes
+        List containing sqlalchemy classes which represent each script.
+    
+    Returns
+    -------
+    script_title_names : list of strings
+        List of strings representing titles for each script.
+        
+    script_files_url_endpoints : list of strings
+        List of strings representing url endpoints.
+    """
+    
+    script_files_basenames = get_script_files_basenames(script_db_models)
+
+    script_files_url_endpoints = convert_script_files_basenames_to_url_endpoints(script_files_basenames)
+
+    script_files_title_names = convert_script_files_basenames_to_title_names(script_files_basenames)
+    
+    return script_files_title_names, script_files_url_endpoints
     
     

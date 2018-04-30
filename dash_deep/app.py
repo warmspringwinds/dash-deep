@@ -67,11 +67,11 @@ db = SQLAlchemy(server)
 
 # This is needed so that users can add additional scripts into scripts/ directory
 # and we can automatically import all of them.
-import dash_deep.scripts
+from . import scripts
 
-for loader, name, is_pkg in pkgutil.walk_packages(dash_deep.scripts.__path__):
+for loader, name, is_pkg in pkgutil.walk_packages(scripts.__path__):
     
-    full_name = dash_deep.scripts.__name__ + '.' + name
+    full_name = scripts.__name__ + '.' + name
     
     importlib.import_module(full_name)
     

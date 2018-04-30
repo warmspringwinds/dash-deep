@@ -1,7 +1,21 @@
-from app import *
+from dash_deep.app import app, scripts_db_models, server
 
-import widjets.gpu_utilization_monitor
-import widjets.training_jobs_monitor
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output, State
+
+from dash_deep.widjets import gpu_utilization_monitor
+from dash_deep.widjets import training_jobs_monitor
+from dash_deep.widjets import widjets_factory
+
+from dash_deep.utils import get_script_titles_and_url_endpoints
+
+
+script_files_title_names, script_files_url_endpoints = get_script_titles_and_url_endpoints(scripts_db_models)
+
+main_page_scripts_widjet_layout = widjets_factory.generate_main_page_scripts_widjet(script_files_title_names, script_files_url_endpoints)
+
 
 
 app.layout = html.Div([
@@ -18,18 +32,6 @@ index_page = html.Div([
     dcc.Link('Training script parsing', href='/scripts')
 ])
 
-
-
-script_parse_layout = html.Div([
-
-    html.Label('Scipt to parse'),
-    dcc.Input(id='input-1'),
-
-    html.Button('Parse script', id='button-2'),
-
-    html.Div(id='output')
-    
-], className='container')
 
 
 
@@ -50,15 +52,15 @@ def display_page(pathname):
     
     if pathname == '/gpu':
         
-        return widjets.gpu_utilization_monitor.layout
+        return gpu_utilization_monitor.layout
     
     elif pathname == '/tasks':
         
-        return widjets.training_jobs_monitor.layout
+        return training_jobs_monitor.layout
     
     elif pathname == '/scripts':
         
-        return script_parse_layout
+        return main_page_scripts_widjet_layout
     
     else:
         
