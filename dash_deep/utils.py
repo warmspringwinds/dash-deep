@@ -1,3 +1,37 @@
+from wtforms import Form
+from wtforms.ext.sqlalchemy.orm import model_form
+
+
+
+def generate_wtform_script_classes(scripts_db_models):
+    """Generates wtforms.ext.sqlalchemy.orm classes for each script database class. 
+    
+    As most requirements to the input fields are specified in the classes of sql
+    models representing each script -- we can automatically create wtform classes
+    for each of them. This wtforms are later on used to generate input form widjets
+    for each script and to validate the user inputs + populate the sql model objects.
+    
+    Parameters
+    ----------
+    script_db_models : list of sqlalchemy classes
+        List containing sqlalchemy classes which represent each script.
+    
+    Returns
+    -------
+    script_wtform_classes : list of wtforms.ext.sqlalchemy.orm classes
+        List of classes representing wtforms for each sql models of a script.
+    """
+    
+    def get_wtform_script_class(script_db_model):
+        
+        script_wtform_class = model_form(script_db_model, Form)
+        
+        return script_wtform_class
+    
+    script_wtform_classes = map(lambda script_db_model: get_wtform_script_class(script_db_model),
+                                scripts_db_models)
+    
+    return script_wtform_classes
 
 
 def get_script_files_basenames(script_db_models):
