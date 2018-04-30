@@ -1,4 +1,4 @@
-# dash-deep
+# Dash-deep
 
 To start the server run:
 ```
