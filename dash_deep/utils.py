@@ -3,8 +3,8 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from dash_deep.widjets.widjets_factory import generate_widjet_from_form
 
 
-def generate_wtform_classes_and_input_form_widjets(scripts_db_models):
-    """Generates wtform classes and input form widjets for each sqlalchemy model
+def generate_wtform_instances_and_input_form_widjets(scripts_db_models):
+    """Generates wtform classes instances and input form widjets for each sqlalchemy model
     representing a script.
     
     Wtforms and input widjets are used together to get user input, validate it
@@ -17,21 +17,21 @@ def generate_wtform_classes_and_input_form_widjets(scripts_db_models):
     
     Returns
     -------
-    script_wtform_classes : list of wtforms.ext.sqlalchemy.orm classes
-        List of classes representing wtforms for each sql models of a script.
+    script_wtform_classes_instances : list of wtforms.ext.sqlalchemy.orm classes instances
+        List of classes instances representing wtforms for each sql models of a script.
         
     scripts_input_form_widjets : list of dash.html.Div instances
         List containing the dash input forms for each script. 
     """
         
-    wtform_classes = generate_script_wtform_classes(scripts_db_models)
+    wtform_classes_instances = generate_script_wtform_instances(scripts_db_models)
 
-    scripts_input_form_widjets = generate_scripts_input_form_widjets(wtform_classes)
+    scripts_input_form_widjets = generate_scripts_input_form_widjets(wtform_classes_instances)
     
-    return wtform_classes, scripts_input_form_widjets
+    return wtform_classes_instances, scripts_input_form_widjets
 
 
-def generate_scripts_input_form_widjets(scripts_wtform_classes):
+def generate_scripts_input_form_widjets(scripts_wtform_classes_instances):
     """Generates input form dash widjets for each wtform class representing a script.
     
     By doing this we avoid code duplicating as all the name of the fields and requirements
@@ -39,8 +39,8 @@ def generate_scripts_input_form_widjets(scripts_wtform_classes):
     
     Parameters
     ----------
-    scripts_wtform_classes : list of wtforms.ext.sqlalchemy.orm classes
-        List containing classes representing script input form.
+    scripts_wtform_classes_instances : list of wtforms.ext.sqlalchemy.orm classes instances
+        List containing classes instances representing script input form.
     
     Returns
     -------
@@ -50,12 +50,7 @@ def generate_scripts_input_form_widjets(scripts_wtform_classes):
     
     scripts_input_form_widjets = []
     
-    for script_wtform_class in scripts_wtform_classes:
-        
-        # TODO: might do better than that
-        # Not the best way to do it but I couldn't fina another
-        # clearn way
-        wtform_class_instance = script_wtform_class()
+    for wtform_class_instance in scripts_wtform_classes_instances:
         
         script_input_form_widjet = generate_widjet_from_form(wtform_class_instance)
         
@@ -64,7 +59,7 @@ def generate_scripts_input_form_widjets(scripts_wtform_classes):
     return scripts_input_form_widjets
 
 
-def generate_script_wtform_classes(scripts_db_models):
+def generate_script_wtform_instances(scripts_db_models):
     """Generates wtforms.ext.sqlalchemy.orm classes for each script database class. 
     
     As most requirements to the input fields are specified in the classes of sql
@@ -79,20 +74,22 @@ def generate_script_wtform_classes(scripts_db_models):
     
     Returns
     -------
-    script_wtform_classes : list of wtforms.ext.sqlalchemy.orm classes
-        List of classes representing wtforms for each sql models of a script.
+    script_wtform_class_instances : list of wtforms.ext.sqlalchemy.orm classes instances
+        List instances of classes representing wtforms for each sql models of a script.
     """
     
-    def get_wtform_script_class(script_db_model):
+    def get_wtform_script_class_instance(script_db_model):
         
         script_wtform_class = model_form(script_db_model, Form)
         
-        return script_wtform_class
+        script_wtform_class_instance = script_wtform_class()
+        
+        return script_wtform_class_instance
     
-    script_wtform_classes = map(lambda script_db_model: get_wtform_script_class(script_db_model),
-                                scripts_db_models)
+    script_wtform_class_instances = map(lambda script_db_model: get_wtform_script_class_instance(script_db_model),
+                                        scripts_db_models)
     
-    return script_wtform_classes
+    return script_wtform_class_instances
 
 
 def get_script_files_basenames(script_db_models):
