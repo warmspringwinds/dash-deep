@@ -1,5 +1,8 @@
 import dash_html_components as html
 import dash_core_components as dcc
+from dash.dependencies import Input, Output, State
+
+from dash_deep.app import app
 
 
 def generate_widjet_from_form(form):
@@ -20,20 +23,63 @@ def generate_widjet_from_form(form):
         dash.html.Div object containing the input fields
     """
     
+    # Since the wtform inherits the name of sqlalchemy script model
+    # and they should have unique names
+    id_prefix = form.__class__.__name__ + "-"
+    
+    # Here we will accumulate the input fields dash.html objects
+    # that will be displayed to user
     elements_list = []
+    
+    # Here we will accumulate the dash.State objects that we will
+    # use to read off the values provided by the user when the button
+    # is pressed
+    states_list = []
     
     for form_element in form:
         
+        element_id_name = id_prefix + form_element.id
+        
         html_label = html.Label(form_element.name)
-        html_input_field = dcc.Input(id=form_element.id)
+        html_input_field = dcc.Input(id=element_id_name)
+        states_list.append( State(element_id_name, 'value') )
         
         elements_list.append(html_label)
         elements_list.append(html_input_field)
     
-    button_element = html.Button('Run', id='run-experiment-button')
+    # Adding an element where we will output validation errors
+    errors_element_id_name = id_prefix + 'Errors'
+    elements_list.append(html.Div(id=errors_element_id_name,
+                                  style={"color": "red"}))
+    
+    # Adding a button
+    button_element_id_name = id_prefix + 'run-script-button'
+    button_element = html.Button('Run', id=button_element_id_name)
     elements_list.append(button_element)
     
     form_widjet = html.Div(elements_list)
+    
+    @app.callback(
+    Output(errors_element_id_name, 'children'),
+    [Input(button_element_id_name, 'n_clicks')],
+    state=states_list)
+    def press_event_callback(*arg):
+        
+        # The number of elements in the form can vary
+        # first input argument is always number of clicks,
+        # all other elements are inputs provided by user to the
+        # form.
+        user_input_form = arg[1:]
+        
+        for user_input, form_element in zip(user_input_form, form):
+            
+            form_element.data = user_input
+            
+        form.validate()
+        
+        return 'Input validation error: {}'.format(
+            form.errors
+        )
     
     return form_widjet
 
