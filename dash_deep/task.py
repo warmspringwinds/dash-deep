@@ -33,6 +33,10 @@ class TaskManager():
 
         """
         
+        # TODO: so far we are using only one name 'main' which
+        # should be defined in the experiment model, but we had and idea
+        # to use multiple names like 'initiate', 'run', 'conclude', 'on_error' which can
+        # be run before, during, after, in case of error successful execution of a specified task
         future_obj = self.process_pool.schedule(form.actions['main'],
                                                 kwargs=form.data)
         
