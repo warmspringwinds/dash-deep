@@ -10,7 +10,13 @@ class TaskManager():
         
         # Initializing process pool that will be used under the hood
         # to schedule all the tasks and get 'future' object as a return value
-        self.process_pool = ProcessPool()
+        
+        # Important!!!: max_tasks=1 means that after performing each
+        # task process is restarted. This is because there is no other
+        # way to make deep learning frameworks to fully free up the gpu
+        # memory that they have used other than stopping the process.
+        # https://pebble.readthedocs.io/en/latest/#pebble.ProcessPool
+        self.process_pool = ProcessPool(max_tasks=1)
         
         # This list is responsible for storing 'future' object of every
         # scheduled task
