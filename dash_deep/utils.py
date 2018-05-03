@@ -84,6 +84,11 @@ def generate_script_wtform_instances(scripts_db_models):
         
         script_wtform_class_instance = script_wtform_class()
         
+        # Copying the the actions field defined by the user in the model
+        # into the wtform instance. This action will be triggered
+        # once the form is validated
+        script_wtform_class_instance.actions = script_db_model.actions
+        
         return script_wtform_class_instance
     
     script_wtform_class_instances = map(lambda script_db_model: get_wtform_script_class_instance(script_db_model),
