@@ -14,33 +14,12 @@ import os
 import pkgutil
 import importlib
 
-from pebble import ProcessPool
-from time import sleep
-from multiprocessing import Manager
+from dash_deep.task import TaskManager
 
-import random
-
-tasks = []
-losses_arrays = []
-
-process_pool = ProcessPool()
-
-# We use manager to perform the communication between processes
-manager = Manager()
-
-
-def slow_function(process_list):
-    
-    for x in xrange(3):
-        
-        sleep(3)
-        process_list.append(random.random())
-        
-    return
+task_manager = TaskManager()
 
 
 server = Flask(__name__)
-
 
 # Creating database connection and initializing the database in case
 # it's the first time the app is run
