@@ -2,7 +2,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 
-from dash_deep.app import app
+from dash_deep.app import app, task_manager
 
 
 def generate_widjet_from_form(form):
@@ -22,6 +22,9 @@ def generate_widjet_from_form(form):
     form_widjet : dash.html.Div
         dash.html.Div object containing the input fields
     """
+    
+    # TODO: when the form is displayed the click event is started
+    # for some reason.
     
     # Since the wtform inherits the name of sqlalchemy script model
     # and they should have unique names
@@ -49,8 +52,9 @@ def generate_widjet_from_form(form):
     
     # Adding an element where we will output validation errors
     errors_element_id_name = id_prefix + 'Errors'
-    elements_list.append(html.Div(id=errors_element_id_name,
-                                  style={"color": "red"}))
+    errors_element = html.Div(id=errors_element_id_name,
+                                  style={"color": "red"})
+    elements_list.append(errors_element)
     
     # Adding a button
     button_element_id_name = id_prefix + 'run-script-button'
@@ -74,13 +78,21 @@ def generate_widjet_from_form(form):
         for user_input, form_element in zip(user_input_form, form):
             
             form_element.data = user_input
-            
-        form.validate()
         
-        return 'Input validation error: {}'.format(
-            form.errors
-        )
-    
+        
+        if form.validate():
+            
+            task_manager.schedule_task_from_form(form)
+            
+            return html.Div("The task was scheduled", style={'color': 'green'})
+        else:
+            
+            return html.Div('Input validation error: {}'.format(
+             form.errors
+            ), style={'color': 'red'})
+            
+            
+        
     return form_widjet
 
 
