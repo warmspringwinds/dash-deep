@@ -1,13 +1,26 @@
 from dash_deep.app import db
+from time import sleep
+import torch
 
 
-class ImagenetClassification(db.Model):
+def run(batch_size,
+        learning_rate):
     
-    id = db.Column(db.Integer, primary_key=True)
-    batch_size = db.Column(db.String(80), unique=True, nullable=False)
-    learning_rate = db.Column(db.String(120), unique=True, nullable=False)
+    # Probably should also provide initiated db class object
+    print('started the classification job')
     
-    actions = {'main': lambda x: x}
+    test = torch.ones(100, 100, 10).cuda()
+    
+    # Simulate training
+    sleep(5)
+    
+    print('finished the job')
+    
+    # populated_object.batch_size = '555'
+    # populated_object.learning_rate = '100'
+    # populated_object.output_stride = '777'
 
-    def __repr__(self):
-        return '<Imagenet classification experiment>'
+    # db.session.add(populated_object)
+    # db.session.commit()
+    
+    return 'success'
