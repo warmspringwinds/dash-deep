@@ -117,12 +117,14 @@ def get_script_titles_and_url_endpoints(script_db_models):
     script_full_url_endpoints : list of strings
         List of strings representing url endpoints.
     """
-    
+    # Extracting the .title attribute
     script_titles = map(lambda script_db_model: script_db_model.title, script_db_models)
     
+    # Lowercasing title and replacing spaces with underscores
     script_url_endpoints = map(lambda script_title: script_title.lower().replace(' ', '_'),
                           script_titles)
     
+    # Appending the global url endpoint responsible for all scripts forms
     script_full_url_endpoints = map(lambda script_url_endpoint: '/scripts/' + script_url_endpoint,
                                     script_url_endpoints) 
     
