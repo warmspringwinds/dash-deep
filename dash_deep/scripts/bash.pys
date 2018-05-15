@@ -2,7 +2,7 @@ import click
 
 from dash_deep.utils import generate_wtform_instances_and_input_form_widjets
 from dash_deep.scripts.semantic_segmentation_train_script import PascalSegmentation
-from dash_deep.cli.interface_factory import generate_click_cli
+from dash_deep.cli.cli_factory import generate_click_cli
 
 
 forms, widjets = generate_wtform_instances_and_input_form_widjets([PascalSegmentation])

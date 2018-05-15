@@ -42,20 +42,9 @@ db = SQLAlchemy(server)
 
 
 # In order for all our database models representing the scripts
-# to be available in db object, we need to import each module representing script
+# to be available in db object, we need to import dash_deep.models
 
-# This is needed so that users can add additional scripts into scripts/ directory
-# and we can automatically import all of them.
-from dash_deep import scripts
-
-for loader, name, is_pkg in pkgutil.walk_packages(scripts.__path__):
-    
-    full_name = scripts.__name__ + '.' + name
-    
-    importlib.import_module(full_name)
-    
-    print "Detected and registered a scipt {}\n".format(name)
-
+import dash_deep.models
     
 # Now gettting all the classes representing database models of each script
 # https://stackoverflow.com/questions/26514823/get-all-models-from-flask-sqlalchemy-db/26518401

@@ -8,6 +8,7 @@ from dash.dependencies import Input, Output, State
 from dash_deep.widjets import gpu_utilization_monitor
 #from dash_deep.widjets import training_jobs_monitor
 from dash_deep.widjets import widjets_factory
+from dash_deep.widjets import tasks_manager
 
 from dash_deep.utils import get_script_titles_and_url_endpoints
 from dash_deep.utils import generate_wtform_instances_and_input_form_widjets
@@ -62,7 +63,7 @@ def display_page(pathname):
     elif pathname == '/tasks':
         
         #return training_jobs_monitor.layout
-        return gpu_utilization_monitor.layout
+        return tasks_manager.layout
     
     elif pathname == '/scripts':
         

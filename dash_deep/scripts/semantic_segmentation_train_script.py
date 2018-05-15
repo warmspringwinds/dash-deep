@@ -2,33 +2,32 @@ from dash_deep.app import db
 from time import sleep
 
 
-class PascalSegmentation(db.Model):
-    
-    id = db.Column(db.Integer, primary_key=True)
-    batch_size = db.Column(db.String(80), nullable=False)
-    learning_rate = db.Column(db.String(120), nullable=False)
-    output_stride = db.Column(db.String(120), nullable=False)
-    
-    actions = {}
-    
-    def __repr__(self):
-        return '<Pascal Image Segmentation experiment>'
 
-
-def run(populated_object):
+def run(batch_size, learning_rate, output_stride):
     
-    db.engine.dispose()
+    #db.engine.dispose()
+    print('started the job')
+    
+    import torch
+    
+    test = torch.ones(100, 100, 10).cuda()
     
     # Simulate training
-    sleep(7)
+    sleep(5)
     
-    populated_object.batch_size = '555'
-    populated_object.learning_rate = '100'
-    populated_object.output_stride = '777'
+    print('finished the job')
     
-    db.session.add(populated_object)
-    db.session.commit()
+    #del test
+    
+    #torch.cuda.empty_cache()
+    
+#     populated_object.batch_size = '555'
+#     populated_object.learning_rate = '100'
+#     populated_object.output_stride = '777'
+    
+#     db.session.add(populated_object)
+#     db.session.commit()
     
     return 'success'
 
-PascalSegmentation.actions['main'] = run
+#PascalSegmentation.actions['main'] = run
