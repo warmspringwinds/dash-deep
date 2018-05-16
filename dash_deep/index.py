@@ -11,7 +11,7 @@ from dash_deep.widjets import widjets_factory
 from dash_deep.widjets import tasks_manager
 
 from dash_deep.utils import get_script_titles_and_url_endpoints
-from dash_deep.utils import generate_wtform_instances_and_input_form_widjets
+from dash_deep.utils import generate_wtform_instances_and_input_form_widjets, generate_scripts_input_form_cli_interfaces
 
 
 script_files_title_names, script_files_url_endpoints = get_script_titles_and_url_endpoints(scripts_db_models)
@@ -19,6 +19,8 @@ script_files_title_names, script_files_url_endpoints = get_script_titles_and_url
 main_page_scripts_widjet_layout = widjets_factory.generate_main_page_scripts_widjet(script_files_title_names, script_files_url_endpoints)
 
 wtform_classes, scripts_input_form_widjets = generate_wtform_instances_and_input_form_widjets(scripts_db_models)
+
+scripts_input_form_cli_interfaces = generate_scripts_input_form_cli_interfaces(wtform_classes)
 
 
 app.layout = html.Div([

@@ -1,6 +1,7 @@
 from wtforms import Form
 from wtforms.ext.sqlalchemy.orm import model_form
 from dash_deep.widjets.widjets_factory import generate_widjet_from_form
+from dash_deep.cli.cli_factory import generate_click_cli
 
 
 def generate_wtform_instances_and_input_form_widjets(scripts_db_models):
@@ -57,6 +58,34 @@ def generate_scripts_input_form_widjets(scripts_wtform_classes_instances):
         scripts_input_form_widjets.append(script_input_form_widjet)
     
     return scripts_input_form_widjets
+
+
+def generate_scripts_input_form_cli_interfaces(scripts_wtform_classes_instances):
+    """Generates input command line interface for each wtform class representing a script.
+    
+    By doing this we avoid code duplicating as all the name of the fields and requirements
+    are defined in the sqlalchemy model class already.
+    
+    Parameters
+    ----------
+    scripts_wtform_classes_instances : list of wtforms.ext.sqlalchemy.orm classes instances
+        List containing classes instances representing script input form.
+    
+    Returns
+    -------
+    scripts_input_form_cli_interfaces : list of click.core.Command objects
+        List containing the click command line objects.
+    """
+    
+    scripts_input_form_cli_interfaces = []
+    
+    for wtform_class_instance in scripts_wtform_classes_instances:
+        
+        scripts_input_form_cli_interface = generate_click_cli(wtform_class_instance)
+        
+        scripts_input_form_cli_interfaces.append(scripts_input_form_cli_interface)
+    
+    return scripts_input_form_cli_interfaces
 
 
 def generate_script_wtform_instances(scripts_db_models):
