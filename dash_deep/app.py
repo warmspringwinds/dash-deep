@@ -39,6 +39,10 @@ if not os.path.exists(database_path):
 
 server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + database_file_location
 
+# Just temporary removes warning messages
+# TODO: explore more on what this option actually does
+server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 # Database object 
 db = SQLAlchemy(server)
 

@@ -127,7 +127,7 @@ def generate_script_wtform_instances(scripts_db_models):
 
 
 
-def get_script_titles_and_url_endpoints(script_db_models):
+def get_script_titles_url_endpoints_and_cli_names(script_db_models):
     """Generates titles and url endpoints for each script from its sqlalchemy model class.
     
     Converts sqlalchemy class for each script into title and url endpoint that will be used
@@ -145,6 +145,10 @@ def get_script_titles_and_url_endpoints(script_db_models):
         
     script_full_url_endpoints : list of strings
         List of strings representing url endpoints.
+    
+    script_cli_names : list of strings
+        List of strings representing comman line names of commands.
+        
     """
     # Extracting the .title attribute
     script_titles = map(lambda script_db_model: script_db_model.title, script_db_models)
@@ -153,9 +157,11 @@ def get_script_titles_and_url_endpoints(script_db_models):
     script_url_endpoints = map(lambda script_title: script_title.lower().replace(' ', '_'),
                           script_titles)
     
+    script_cli_names = script_url_endpoints
+    
     # Appending the global url endpoint responsible for all scripts forms
     script_full_url_endpoints = map(lambda script_url_endpoint: '/scripts/' + script_url_endpoint,
                                     script_url_endpoints) 
     
-    return script_titles, script_full_url_endpoints
+    return script_titles, script_full_url_endpoints, script_cli_names
     

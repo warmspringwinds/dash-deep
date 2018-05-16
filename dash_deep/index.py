@@ -10,11 +10,11 @@ from dash_deep.widjets import gpu_utilization_monitor
 from dash_deep.widjets import widjets_factory
 from dash_deep.widjets import tasks_manager
 
-from dash_deep.utils import get_script_titles_and_url_endpoints
+from dash_deep.utils import get_script_titles_url_endpoints_and_cli_names
 from dash_deep.utils import generate_wtform_instances_and_input_form_widjets, generate_scripts_input_form_cli_interfaces
 
 
-script_files_title_names, script_files_url_endpoints = get_script_titles_and_url_endpoints(scripts_db_models)
+script_files_title_names, script_files_url_endpoints, cli_names = get_script_titles_url_endpoints_and_cli_names(scripts_db_models)
 
 main_page_scripts_widjet_layout = widjets_factory.generate_main_page_scripts_widjet(script_files_title_names, script_files_url_endpoints)
 
@@ -22,7 +22,16 @@ wtform_classes, scripts_input_form_widjets = generate_wtform_instances_and_input
 
 scripts_input_form_cli_interfaces = generate_scripts_input_form_cli_interfaces(wtform_classes)
 
+# TODO: factor out into a separate function?
+# Names are not defined so we get an empty strings in our command line
+# we should somehow push names there.
 
+for script_number, scripts_input_form_cli_interface in enumerate(scripts_input_form_cli_interfaces):
+    
+    server.cli.add_command( scripts_input_form_cli_interface,
+                           name=cli_names[script_number] )
+    
+    
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')

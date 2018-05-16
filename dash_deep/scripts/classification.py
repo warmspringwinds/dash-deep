@@ -1,26 +1,43 @@
 from dash_deep.app import db
+
 from time import sleep
+import click
+
 import torch
 
+# TODO: click for some reason ignores newline characters so we had to use
+# more break symbols than necessary
 
-def run(batch_size,
-        learning_rate):
+def run(batch_size, learning_rate):
+    """ Runs an imagenet training experiment.
     
-    # Probably should also provide initiated db class object
-    print('started the classification job')
+    A dummy experiment that demonstrates an application
+    for the problem of image classification on imagenet dataset.
     
-    test = torch.ones(100, 100, 10).cuda()
+    Parameters
     
-    # Simulate training
-    sleep(5)
+    ----------
     
-    print('finished the job')
+    batch_size : int
     
-    # populated_object.batch_size = '555'
-    # populated_object.learning_rate = '100'
-    # populated_object.output_stride = '777'
-
-    # db.session.add(populated_object)
-    # db.session.commit()
+        Size of a batch to use during training.
+    
+    
+    learning_rate : float
+    
+    
+        Lerning rate to be used by optimization algorithm.
+    """
+    
+    
+    epochs = range(30)
+    
+    # Creates a progress bar.
+    with click.progressbar(epochs) as epochs:
+        
+        for epoch in epochs:
+            
+            sleep(1)
+    
     
     return 'success'

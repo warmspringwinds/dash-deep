@@ -5,7 +5,7 @@ from dash_deep.scripts.semantic_segmentation_train_script import run as pascal_s
 
 class PascalSegmentation(db.Model):
     
-    title = 'Pascal Semantic Segmentation Experiment'
+    title = 'Pascal Semantic Segmentation'
     id = db.Column(db.Integer, primary_key=True)
     
     batch_size = db.Column(db.String(80), nullable=False)
@@ -23,7 +23,7 @@ from dash_deep.scripts.classification import run as imagenet_classification_run
     
 class ImagenetClassification(db.Model):
     
-    title = 'Imagenet Classification Experiment'
+    title = 'Imagenet Classification'
     id = db.Column(db.Integer, primary_key=True)
     
     batch_size = db.Column(db.String(80), unique=True, nullable=False)
