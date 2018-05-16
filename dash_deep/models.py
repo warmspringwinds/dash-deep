@@ -3,7 +3,7 @@ from dash_deep.app import db
 
 from dash_deep.scripts.semantic_segmentation_train_script import run as pascal_segmentation_run
 
-    class PascalSegmentation(db.Model):
+class PascalSegmentation(db.Model):
     
     title = 'Pascal Semantic Segmentation Experiment'
     id = db.Column(db.Integer, primary_key=True)
@@ -18,7 +18,7 @@ from dash_deep.scripts.semantic_segmentation_train_script import run as pascal_s
         
         return '<Pascal Image Segmentation experiment>'
 
-    
+
 from dash_deep.scripts.classification import run as imagenet_classification_run
     
 class ImagenetClassification(db.Model):

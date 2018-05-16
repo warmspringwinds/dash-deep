@@ -80,5 +80,6 @@ def display_page(pathname):
     
 if __name__ == '__main__':
     
-    server.run(host='0.0.0.0') #debug=True)
+    server.cli()
+    #server.run(host='0.0.0.0')
     

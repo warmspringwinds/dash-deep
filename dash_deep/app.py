@@ -16,6 +16,8 @@ import importlib
 
 from dash_deep.task import TaskManager
 
+import click
+
 task_manager = TaskManager()
 
 
@@ -52,9 +54,15 @@ import dash_deep.models
 scripts_db_models = [cls for cls in db.Model._decl_class_registry.values()
                      if isinstance(cls, type) and issubclass(cls, db.Model)]
 
+
+# Adding default command line commands
+# They are registered automatically after we import this module
+import dash_deep.cli.default_commands
+
 # Initializing the Dash application
 
 app = dash.Dash(__name__, server=server)
+
 
 # Since we're adding callbacks to elements that don't exist in the app.layout,
 # Dash will raise an exception to warn us that we might be
