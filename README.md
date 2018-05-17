@@ -1,12 +1,19 @@
 # Dash-deep
 
 To start the server run:
+
 ```
- python -m dash_deep.index
+ python -m dash_deep.index run_server <ip_address> <port>
 ```
 
-Milestones:
+Open browser and navigate to:
 
-1. Deploy the generator of form widjets for sql model classes.
-2. Register the form widjets in the router.
-3. Write some running logic with threads and check if models are saved.
+```
+<ip_address>:<port>/
+```
+
+To get the help page, call:
+
+```
+ python -m dash_deep.index --help
+```
