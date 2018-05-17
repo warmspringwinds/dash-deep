@@ -16,7 +16,7 @@ class EndovisBinary(db.Model):
     
     def __repr__(self):
         
-        return '<Pascal Image Segmentation experiment>'
+        return '<Endovis Binary Segmentation experiment>'
 
 
 from dash_deep.scripts.imagenet_classification_train import run as imagenet_classification_train_run
