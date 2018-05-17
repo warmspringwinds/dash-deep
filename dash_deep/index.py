@@ -96,9 +96,9 @@ if __name__ == '__main__':
     try:
         server.cli()
         
-    except BaseException as e:
+    except (Exception, KeyboardInterrupt) as e:
    
-        print e.message
+        print(e.message)
         
     finally:
         
