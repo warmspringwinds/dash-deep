@@ -33,11 +33,11 @@ def run(batch_size, learning_rate):
     epochs = range(30)
     
     # Creates a progress bar.
-    with click.progressbar(epochs) as epochs:
+    #with click.progressbar(epochs) as epochs:
         
-        for epoch in epochs:
-            
-            sleep(1)
+    for epoch in epochs:
+
+        sleep(1)
     
     
     return 'success'
