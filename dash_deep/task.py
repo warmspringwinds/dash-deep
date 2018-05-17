@@ -1,4 +1,35 @@
-from pebble import ProcessPool
+import pebble
+
+# Monkey-patching pebble to make its children non-daemonic
+# We need this in order to allow children to spawn processes too
+# Children should be able to spawn processes too because data loading
+# routings in ml scripts usually spawn multiple processes in order to 
+# load data faster.
+
+# Problems that might occur:
+# When there is a job that has already been started and the server
+# recieves the sigterm, it will not kill the spawned jobs.
+
+# TODO: Solution: listen to sigterm and manually go through array of
+# pebble 'future' objects to stop them before quiting.
+
+# See discussion here:
+# https://github.com/noxdafox/pebble/issues/31
+from multiprocessing import Process
+
+def launch_process_patched(function, *args, **kwargs):
+    
+    process = Process(target=function, args=args, kwargs=kwargs)
+    process.daemon = False
+    process.start()
+
+    return process
+
+
+import pebble.pool.process
+
+pebble.pool.process.launch_process = launch_process_patched
+
 
 
 class TaskManager():
@@ -16,7 +47,7 @@ class TaskManager():
         # way to make deep learning frameworks to fully free up the gpu
         # memory that they have used other than stopping the process.
         # https://pebble.readthedocs.io/en/latest/#pebble.ProcessPool
-        self.process_pool = ProcessPool(max_tasks=1)
+        self.process_pool = pebble.ProcessPool(max_tasks=1)
         
         # This list is responsible for storing 'future' object of every
         # scheduled task
