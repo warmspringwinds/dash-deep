@@ -88,6 +88,8 @@ def display_page(pathname):
         
         return index_page
 
+# TODO: for some reason the server crushes when being run
+# in a debug mode.
     
 if __name__ == '__main__':
     
