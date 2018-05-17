@@ -96,7 +96,7 @@ if __name__ == '__main__':
     try:
         server.cli()
         
-    except Exception as e:
+    except BaseException as e:
    
         print e.message
         
