@@ -1,4 +1,4 @@
-from dash_deep.app import app, scripts_db_models, server
+from dash_deep.app import app, scripts_db_models, server, task_manager
 
 import dash
 import dash_core_components as dcc
@@ -91,6 +91,17 @@ def display_page(pathname):
     
 if __name__ == '__main__':
     
-    server.cli()
-    #server.run(host='0.0.0.0')
+    # Read dash_deep/task.py for more info about this
+    # piece of code.
+    try:
+        server.cli()
+        
+    except Exception as e:
+   
+        print e.message
+        
+    finally:
+        
+        task_manager.shutdown()
+    
     

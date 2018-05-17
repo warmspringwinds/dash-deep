@@ -6,15 +6,8 @@ import pebble
 # routings in ml scripts usually spawn multiple processes in order to 
 # load data faster.
 
-# Problems that might occur:
-# When there is a job that has already been started and the server
-# recieves the sigterm, it will not kill the spawned jobs.
+# Read the doc of TaskManager.shutdown() for more information about this.
 
-# TODO: Solution: listen to sigterm and manually go through array of
-# pebble 'future' objects to stop them before quiting.
-
-# See discussion here:
-# https://github.com/noxdafox/pebble/issues/31
 from multiprocessing import Process
 
 def launch_process_patched(function, *args, **kwargs):
@@ -78,4 +71,27 @@ class TaskManager():
                                                 kwargs=form.data)
         
         self.tasks_list.append(future_obj)
+   
+    def shutdown(self):
+        """Stops all the running jobs.
+    
+        Cancels all the running processes. We need this in order to stop all
+        jobs in case the server receives a signal to shutdown. This way we avoid
+        orphaned processes which might appear in case we don't run this when shutting down
+        the server.
+        
+        We call this method whenever the main application throws and exception --
+        this way in case the server has an internal problem or if it receives
+        KeyboardInterrupt, we stop all spawned processes, therefore, avoiding
+        orphaned processes. This is performed in the if __name__ == '__main__':
+        section of dash_deep/index.py.
+        
+        See discussion here:
+        https://github.com/noxdafox/pebble/issues/31
+
+        """
+        
+        self.process_pool.stop()
+        
+        self.process_pool.join()
         
