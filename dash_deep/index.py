@@ -35,7 +35,7 @@ for script_number, scripts_input_form_cli_interface in enumerate(scripts_input_f
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
-])
+], className='container')
 
 
 index_page = html.Div([
