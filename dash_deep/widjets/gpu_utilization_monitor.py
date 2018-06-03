@@ -18,7 +18,7 @@ layout = html.Div([
    
             html.H1('GPU'),
             dcc.Interval(id='gpu-state-update-interval', interval=1000),
-            html.Div(id='gpu-state-container'),
+            html.Div(id='gpu-state-container', style={'text-align': 'left'})
 ])
 
 @app.callback(
