@@ -12,7 +12,11 @@ class EndovisBinary(db.Model):
     learning_rate = db.Column(db.String(120), nullable=False)
     output_stride = db.Column(db.String(120), nullable=False)
     
+    graphs = db.Column(db.PickleType())
+    
     actions = {'main': endovis_binary_segmentation_train_run}
+    
+    exclude_from_form = ['graphs']
     
     def __repr__(self):
         
@@ -32,8 +36,12 @@ class ImagenetClassification(db.Model):
     batch_size = db.Column(db.String(80), unique=True, nullable=False)
     learning_rate = db.Column(db.String(120), unique=True, nullable=False)
     
+    graphs = db.Column(db.PickleType())
+    
     actions = {'main': imagenet_classification_train_run}
-
+    
+    exclude_from_form = ['graphs']
+    
     def __repr__(self):
         
         return ('<Imagenet classification experiment batch_size={}, learning_rate={}>'.format(

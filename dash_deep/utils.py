@@ -109,7 +109,10 @@ def generate_script_wtform_instances(scripts_db_models):
     
     def get_wtform_script_class_instance(script_db_model):
         
-        script_wtform_class = model_form(script_db_model, Form)
+        exclude_field_names = script_db_model.exclude_from_form
+        
+        script_wtform_class = model_form(script_db_model, Form,
+                                         exclude=exclude_field_names)
         
         script_wtform_class_instance = script_wtform_class()
         
