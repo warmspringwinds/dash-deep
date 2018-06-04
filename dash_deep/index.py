@@ -22,6 +22,10 @@ wtform_classes, scripts_input_form_widjets = generate_wtform_instances_and_input
 
 scripts_input_form_cli_interfaces = generate_scripts_input_form_cli_interfaces(wtform_classes)
 
+endovis_history_layout = widjets_factory.generate_script_results_widjet(scripts_db_models[0])
+
+
+
 # TODO: factor out into a separate function?
 # Names are not defined so we get an empty strings in our command line
 # we should somehow push names there.
@@ -39,11 +43,14 @@ app.layout = html.Div([
 
 
 index_page = html.Div([
+    html.H1('Main Menu'),
     dcc.Link('GPU utilization', href='/gpu'),
     html.Br(),
     dcc.Link('Tasks tracking', href='/tasks'),
     html.Br(),
-    dcc.Link('Training script parsing', href='/scripts')
+    dcc.Link('Training script parsing', href='/scripts'),
+    html.Br(),
+    dcc.Link('Endovis Binary History', href='/history')
 ])
 
 
@@ -83,6 +90,10 @@ def display_page(pathname):
     elif pathname in script_files_url_endpoints:
         
         return scripts_input_form_widjets[ script_files_url_endpoints.index(pathname) ]
+    
+    elif pathname == '/history':
+        
+        return endovis_history_layout
     
     else:
         

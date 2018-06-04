@@ -16,7 +16,10 @@ class EndovisBinary(db.Model):
     
     def __repr__(self):
         
-        return '<Endovis Binary Segmentation experiment>'
+        return ('<Endovis Binary Segmentation experiment batch_size={}, learning_rate={}>, output_stride={}'.format(
+                self.batch_size,
+                self.learning_rate,
+                self.output_stride))
 
 
 from dash_deep.scripts.imagenet_classification_train import run as imagenet_classification_train_run
@@ -33,5 +36,7 @@ class ImagenetClassification(db.Model):
 
     def __repr__(self):
         
-        return '<Imagenet classification experiment>'
+        return ('<Imagenet classification experiment batch_size={}, learning_rate={}>'.format(
+                self.batch_size,
+                self.learning_rate))
 

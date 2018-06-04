@@ -132,3 +132,32 @@ def generate_main_page_scripts_widjet(script_files_title_names, script_files_url
         
     return main_page_scripts_widjet_layout
 
+
+
+def generate_script_results_widjet(script_sql_class):
+    
+    script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
+    interval_object_name_id = script_type_name_id + '-update-interval'
+    output_object_name_id = script_type_name_id + '-output-interval'
+    
+    
+    layout = html.Div([
+
+            html.H1(script_sql_class.title),
+            dcc.Interval(id=interval_object_name_id, interval=1000),
+            html.Div(id=output_object_name_id)
+    ])
+
+
+    @app.callback(
+        Output(output_object_name_id, 'children'),
+        [Input(interval_object_name_id, 'n_intervals')])
+    def display_output(n):
+        
+        experiments = script_sql_class.query.all()
+
+        return str(experiments)
+    
+    
+    return layout
+    
