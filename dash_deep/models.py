@@ -1,4 +1,8 @@
 from dash_deep.app import db
+from dash_deep.plot import BaseSegmentationGraph
+import copy
+
+#default_segmentation_training_graph = BaseSegmentationGraph()
 
 
 from dash_deep.scripts.endovis_binary_segmentation_train import run as endovis_binary_segmentation_train_run
@@ -18,12 +22,22 @@ class EndovisBinary(db.Model):
     
     exclude_from_form = ['graphs']
     
+    def __init__(self, *args, **kwargs):
+        
+        super(EndovisBinary, self).__init__(*args, **kwargs)
+        
+        self.batch_size = 100
+        self.learning_rate = 0.0001
+        self.output_stride = 8
+        self.graphs = BaseSegmentationGraph()
+    
     def __repr__(self):
         
-        return ('<Endovis Binary Segmentation experiment batch_size={}, learning_rate={}>, output_stride={}'.format(
+        return ('<Endovis Binary Segmentation experiment batch_size={}, learning_rate={}>, output_stride={}, graphs={}'.format(
                 self.batch_size,
                 self.learning_rate,
-                self.output_stride))
+                self.output_stride,
+                self.graphs))
 
 
 from dash_deep.scripts.imagenet_classification_train import run as imagenet_classification_train_run
@@ -44,7 +58,8 @@ class ImagenetClassification(db.Model):
     
     def __repr__(self):
         
-        return ('<Imagenet classification experiment batch_size={}, learning_rate={}>'.format(
+        return ('<Imagenet classification experiment batch_size={}, learning_rate={}, graphs={}>'.format(
                 self.batch_size,
-                self.learning_rate))
+                self.learning_rate,
+                self.graphs))
 

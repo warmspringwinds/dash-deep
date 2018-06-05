@@ -140,13 +140,20 @@ def generate_script_results_widjet(script_sql_class):
     interval_object_name_id = script_type_name_id + '-update-interval'
     output_object_name_id = script_type_name_id + '-output-interval'
     
+    experiments = script_sql_class.query.all()
+    first_experiment = experiments[0]
+    
+    first_experiment_graph = first_experiment.graphs
     
     layout = html.Div([
 
             html.H1(script_sql_class.title),
             dcc.Interval(id=interval_object_name_id, interval=1000),
-            html.Div(id=output_object_name_id)
-    ])
+            html.Div(id=output_object_name_id),
+            dcc.Graph(
+                    id='graph-1',
+                    figure=first_experiment_graph.figure_obj)
+                ])
 
 
     @app.callback(
