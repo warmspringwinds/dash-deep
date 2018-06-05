@@ -5,26 +5,62 @@ import plotly.graph_objs as go
 
 class BaseSegmentationGraph():
     
+    
     def __init__(self, height=600, width=600):
         
-        figure_obj = tools.make_subplots(rows=2, cols=1,
+        # Creating two subplots with two columns
+        figure_obj = tools.make_subplots(rows=1, cols=2,
                                          subplot_titles=('Losses', 'Accuracy'))
         
-        trace1 = go.Scatter(
-                            x=[],
-                            y=[]
-                            )
+        # Creating curves for val/train accuracy/loss curves
+        training_loss_curve_trace = go.Scatter(
+                                            x=[],
+                                            y=[],
+                                            name = 'Training loss',
+                                            line = dict(
+                                            color = ('rgb(205, 12, 24)')))
 
-        trace2 = go.Scatter(
-                            x=[],
-                            y=[]
-                        )
-        
-        figure_obj.append_trace(trace1, 1, 1)
-        figure_obj.append_trace(trace2, 2, 1)
+        validation_loss_curve_trace = go.Scatter(
+                                            x=[],
+                                            y=[],
+                                            name = 'Validation loss',
+                                            line = dict(
+                                            color = ('rgb(22, 96, 167)')))
+
+        training_accuracy_curve_trace = go.Scatter(
+                                            x=[],
+                                            y=[],
+                                            name = 'Training accuracy',
+                                            line = dict(
+                                            color = ('rgb(205, 12, 24)')))
+
+
+        validation_accuracy_curve_trace = go.Scatter(
+                                            x=[],
+                                            y=[],
+                                            name = 'Validation accuracy',
+                                            line = dict(
+                                            color = ('rgb(22, 96, 167)')))
+
+
+        # associating our scatter objects with each subplot
+        figure_obj.append_trace(training_loss_curve_trace, 1, 1)
+        figure_obj.append_trace(validation_loss_curve_trace, 1, 1)
+        figure_obj.append_trace(training_accuracy_curve_trace, 1, 2)
+        figure_obj.append_trace(validation_accuracy_curve_trace, 1, 2)
 
         figure_obj['layout'].update(height=height,
                                     width=width)
         
+        # Plotly's Figure objects are not serializable,
+        # therefore we convert them into ordered dict and serilize
+        # later to store in the pickle format inside of our db.
         self.figure_obj = figure_obj.get_ordered()
+        
+        # Creating sym links for all curves,
+        # so that we can easily update the object
+        self.training_loss_history = self.figure_obj['data'][0]
+        self.validation_loss_history = self.figure_obj['data'][1]
+        self.training_accuracy_history = self.figure_obj['data'][2]
+        self.validation_accuracy_history = self.figure_obj['data'][3]
         

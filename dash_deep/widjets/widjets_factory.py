@@ -133,18 +133,12 @@ def generate_main_page_scripts_widjet(script_files_title_names, script_files_url
     return main_page_scripts_widjet_layout
 
 
-
 def generate_script_results_widjet(script_sql_class):
     
     script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
     interval_object_name_id = script_type_name_id + '-update-interval'
     output_object_name_id = script_type_name_id + '-output-interval'
-    
-    experiments = script_sql_class.query.all()
-    first_experiment = experiments[0]
-    
-    first_experiment_graph = first_experiment.graphs
-    
+        
     layout = html.Div([
 
             html.H1(script_sql_class.title),
@@ -152,18 +146,19 @@ def generate_script_results_widjet(script_sql_class):
             html.Div(id=output_object_name_id),
             dcc.Graph(
                     id='graph-1',
-                    figure=first_experiment_graph.figure_obj)
+                    figure={'data':[], 'layout': []})
                 ])
 
-
     @app.callback(
-        Output(output_object_name_id, 'children'),
+        Output('graph-1', 'figure'),#Output(output_object_name_id, 'children'),
         [Input(interval_object_name_id, 'n_intervals')])
     def display_output(n):
         
         experiments = script_sql_class.query.all()
+        first_experiment = experiments[0]
+        first_experiment_graph = first_experiment.graphs
 
-        return str(experiments)
+        return first_experiment_graph.figure_obj
     
     
     return layout
