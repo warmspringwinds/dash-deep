@@ -13,6 +13,9 @@ from dash_deep.widjets import tasks_manager
 from dash_deep.utils import get_script_titles_url_endpoints_and_cli_names
 from dash_deep.utils import generate_wtform_instances_and_input_form_widjets, generate_scripts_input_form_cli_interfaces
 
+from dash_table_experiments import DataTable
+
+
 
 script_files_title_names, script_files_url_endpoints, cli_names = get_script_titles_url_endpoints_and_cli_names(scripts_db_models)
 
@@ -38,7 +41,10 @@ for script_number, scripts_input_form_cli_interface in enumerate(scripts_input_f
     
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content')
+    html.Div(id='page-content'),
+    
+    # Fix for:https://community.plot.ly/t/data-tables-with-multi-pages/7282
+    html.Div(DataTable(rows=[{}]), style={'display': 'none'})
 ], className='container', style={'text-align': 'center'})
 
 
@@ -50,7 +56,7 @@ index_page = html.Div([
     html.Br(),
     dcc.Link('Training script parsing', href='/scripts'),
     html.Br(),
-    dcc.Link('Endovis Binary History', href='/history')
+    dcc.Link('Endovis Binary History', href='/history'),
 ])
 
 
