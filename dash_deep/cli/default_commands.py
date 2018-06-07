@@ -1,5 +1,6 @@
 import click
 from dash_deep.app import server, db
+from dash_deep.sql import create_dummy_endovis_records
 
 
 @server.cli.command()
@@ -36,6 +37,20 @@ def initiate_database():
     """
     
     db.create_all()
+
+    
+@server.cli.command()
+def populate_database():
+    """Populates database with dummy data.
+    
+    Commits some dummy data into database -- usually handy for testing purposes.
+    Make sure to have you table initialized before you run this command.
+    """
+    
+    dummy_model_instances_list = create_dummy_endovis_records(30)
+
+    db.session.add_all(dummy_model_instances_list)
+    db.session.commit()
 
 
     
