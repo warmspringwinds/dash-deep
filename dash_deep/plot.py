@@ -6,7 +6,7 @@ import plotly.graph_objs as go
 class BaseSegmentationGraph():
     
     
-    def __init__(self, height=600, width=600):
+    def __init__(self, height=600, width=1000):
         
         # Creating two subplots with two columns
         figure_obj = tools.make_subplots(rows=1, cols=2,
@@ -49,8 +49,8 @@ class BaseSegmentationGraph():
         figure_obj.append_trace(training_accuracy_curve_trace, 1, 2)
         figure_obj.append_trace(validation_accuracy_curve_trace, 1, 2)
 
-        figure_obj['layout'].update(height=height,
-                                    width=width)
+        #figure_obj['layout'].update(height=height,
+        #                            width=width)
         
         # Plotly's Figure objects are not serializable,
         # therefore we convert them into ordered dict and serilize
