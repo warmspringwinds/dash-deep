@@ -3,6 +3,10 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 
 from dash_deep.app import app, task_manager
+from dash_deep.sql import (get_column_names_and_values_from_sql_model_instance,
+                           get_column_names_from_sql_model_class)
+
+import dash_table_experiments as dt
 
 
 def generate_widjet_from_form(form):
@@ -134,32 +138,192 @@ def generate_main_page_scripts_widjet(script_files_title_names, script_files_url
 
 
 def generate_script_results_widjet(script_sql_class):
+       
+#     def create_results_table():
+        
+#         column_names = get_column_names_from_sql_model_class(script_sql_class)
+        
+#         experiments = script_sql_class.query.all()
+        
+#         table_body = []
+#         counter = 0
+        
+#         for experiment in experiments:
+            
+#             row_contents = []
     
+#             experiment_dict = get_column_names_and_values_from_sql_model_instance(experiment)
+
+#             for key, value in experiment_dict.iteritems():
+                
+#                 if key == 'graphs':
+                    
+#                     current_button_id_name = button_id_template.format(counter)
+                    
+#                     row_contents.append(html.Td( html.Button('View plot', id=current_button_id_name) ) )
+                    
+#                     # https://stackoverflow.com/questions/3431676/creating-functions-in-a-loop
+                    
+#                     @app.callback(
+#                         Output(current_button_id_name, 'children'),
+#                         [Input(current_button_id_name, 'n_clicks')])
+#                     def test(n_clicks, counter=counter, experiment=experiment):
+                        
+#                         graph.figure = experiment.graphs.figure_obj
+                        
+#                         print(experiment)
+                    
+#                     continue
+                    
+#                 row_contents.append(html.Td(value))
+            
+#             row_contents = html.Tr(row_contents)#, style={'display': 'none'})
+            
+#             table_body.append(row_contents)
+            
+#             counter = counter + 1
+        
+#         table = html.Table(
+#         # Header
+#             [html.Tr([html.Th(column_name) for column_name in column_names])] +
+#             table_body
+#         )
+            
+
+#         return table
+    
+    
+    column_names = get_column_names_from_sql_model_class(script_sql_class)
+        
+    experiments = script_sql_class.query.all()
+    
+    rows = []
+    
+    for experiment in experiments:
+        
+        rows.append( get_column_names_and_values_from_sql_model_instance(experiment) )
+        
+    for row in rows:
+        
+        del row['graphs']
+    
+    table = dt.DataTable(
+        rows=rows,
+        id='datatable',
+        row_selectable=True,
+        filterable=True,
+    )
+    
+    @app.callback(
+    Output('graph_id_name', 'figure'),
+    [Input('datatable', 'rows'),
+     Input('datatable', 'selected_row_indices')])
+    def callback(rows, selected_row_indices):
+        
+        print(rows)
+        print(selected_row_indices)
+        
+        selected_experiments = map(lambda selected_row_index: rows[selected_row_index], selected_row_indices)
+        
+        selected_experiment_ids = tuple(map(lambda experiment: experiment['id'], selected_experiments))
+        
+        extracted_rows = script_sql_class.query.filter(script_sql_class.id.in_(selected_experiment_ids)).all()
+        
+        print(extracted_rows)
+        
+        figure = {'data':[], 'layout': []}
+        
+        if extracted_rows:
+            
+            first = extracted_rows[0]
+            figure = first.graphs.figure_obj
+        
+        return figure
+
     script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
     interval_object_name_id = script_type_name_id + '-update-interval'
     output_object_name_id = script_type_name_id + '-output-interval'
-        
+    button_id_template = script_type_name_id + '-button-{}'
+    graph_id_name = script_type_name_id + '-graph'
+    
+    graph = dcc.Graph(
+                       id='graph_id_name',
+                       figure={'data':[], 'layout': []}
+                      )
+
     layout = html.Div([
 
             html.H1(script_sql_class.title),
             dcc.Interval(id=interval_object_name_id, interval=1000),
             html.Div(id=output_object_name_id),
-            dcc.Graph(
-                    id='graph-1',
-                    figure={'data':[], 'layout': []})
-                ])
-
-    @app.callback(
-        Output('graph-1', 'figure'),#Output(output_object_name_id, 'children'),
-        [Input(interval_object_name_id, 'n_intervals')])
-    def display_output(n):
-        
-        experiments = script_sql_class.query.all()
-        first_experiment = experiments[0]
-        first_experiment_graph = first_experiment.graphs
-
-        return first_experiment_graph.figure_obj
-    
+            graph,
+            table
+    ])
     
     return layout
     
+#     @app.callback(
+#         Output(output_object_name_id, 'children'),
+#         [Input(interval_object_name_id, 'n_intervals')])
+#     def display_output(n):
+        
+#         column_names = get_column_names_from_sql_model_class(script_sql_class)
+        
+#         experiments = script_sql_class.query.all()
+        
+#         table_body = []
+#         counter = 0
+        
+#         for experiment in experiments:
+            
+#             row_contents = []
+    
+#             experiment_dict = get_column_names_and_values_from_sql_model_instance(experiment)
+
+#             for key, value in experiment_dict.iteritems():
+                
+#                 if key == 'graphs':
+                    
+#                     current_button_id_name = button_id_template.format(counter)
+                    
+#                     row_contents.append(html.Td( html.Button('View plot', id=current_button_id_name) ) )
+                    
+#                     continue
+                    
+#                 row_contents.append(html.Td(value))
+            
+#             row_contents = html.Tr(row_contents, style={'display': 'none'})
+            
+#             table_body.append(row_contents)
+            
+#             counter = counter + 1
+        
+#         table = html.Table(
+#         # Header
+#             [html.Tr([html.Th(column_name) for column_name in column_names])] +
+#             table_body
+#         )
+            
+
+#         return table
+        
+#     layout = html.Div([
+
+#             html.H1(script_sql_class.title),
+#             dcc.Interval(id=interval_object_name_id, interval=1000),
+#             html.Div(id=output_object_name_id),
+#             dcc.Graph(
+#                     id='graph-1',
+#                     figure={'data':[], 'layout': []})
+#                 ])
+
+#     @app.callback(
+#         Output('graph-1', 'figure'),#Output(output_object_name_id, 'children'),
+#         [Input(interval_object_name_id, 'n_intervals')])
+#     def display_output(n):
+        
+#         experiments = script_sql_class.query.all()
+#         first_experiment = experiments[0]
+#         first_experiment_graph = first_experiment.graphs
+
+#         return first_experiment_graph.figure_obj

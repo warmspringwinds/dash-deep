@@ -33,7 +33,8 @@ class EndovisBinary(db.Model):
     
     def __repr__(self):
         
-        return ('<Endovis Binary Segmentation experiment batch_size={}, learning_rate={}>, output_stride={}, graphs={}'.format(
+        return ('<Endovis Binary Segmentation experiment id={}, batch_size={}, learning_rate={}>, output_stride={}, graphs={}'.format(
+                self.id,
                 self.batch_size,
                 self.learning_rate,
                 self.output_stride,
