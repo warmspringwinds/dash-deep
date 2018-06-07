@@ -16,32 +16,23 @@ class BaseSegmentationGraph():
         training_loss_curve_trace = go.Scatter(
                                             x=[],
                                             y=[],
-                                            name = 'Training loss',
-                                            line = dict(
-                                            color = ('rgb(205, 12, 24)')))
+                                            name = 'Training loss')
 
         validation_loss_curve_trace = go.Scatter(
                                             x=[],
                                             y=[],
-                                            name = 'Validation loss',
-                                            line = dict(
-                                            color = ('rgb(22, 96, 167)')))
+                                            name = 'Validation loss')
 
         training_accuracy_curve_trace = go.Scatter(
                                             x=[],
                                             y=[],
-                                            name = 'Training accuracy',
-                                            line = dict(
-                                            color = ('rgb(205, 12, 24)')))
+                                            name = 'Training accuracy')
 
 
         validation_accuracy_curve_trace = go.Scatter(
                                             x=[],
                                             y=[],
-                                            name = 'Validation accuracy',
-                                            line = dict(
-                                            color = ('rgb(22, 96, 167)')))
-
+                                            name = 'Validation accuracy')
 
         # associating our scatter objects with each subplot
         figure_obj.append_trace(training_loss_curve_trace, 1, 1)
