@@ -1,8 +1,61 @@
 import random
+from dash_deep.app import db
 from collections import OrderedDict
 from dash_deep.models import EndovisBinary
 from sqlalchemy.orm.attributes import flag_modified
 
+
+def generate_table_contents_from_sql_model_class(sql_model_class):
+    """Extracts all records that are currently stored in the database
+    of the specified class and prepares them to be passed to Dash's datatable.
+
+    Fetches all the records from the database, removes the graph field and
+    converts these records into list of dicts which is accepted by Dash's
+    data table object. Has a special return value in case we don't have
+    any records of the specified class in our database -- this is specific
+    to Dash's data table.
+    
+    Parameters
+    ----------
+    sql_model_class : sqlalchemy model class
+        sqlalchemy model class
+    
+    Returns
+    -------
+    rows : list
+        List of dicts representing database records.
+    """
+    
+    # Dash's data table needs to receive
+    # this exact value in case when we want an empty table
+    # TODO: maybe it can be done in a better way
+    empty_return_value = [{}]
+    
+    if not db.engine.has_table(sql_model_class.__tablename__):
+        
+        return empty_return_value
+
+    experiments = sql_model_class.query.all()
+    
+    if not experiments:
+        
+        return empty_return_value
+
+    # TODO: update the sql query to fetch
+    # all field except the graphs'
+    rows = []
+
+    for experiment in experiments:
+
+        rows.append( get_column_names_and_values_from_sql_model_instance(experiment) )
+
+    # Removing the graph field from our model since
+    # we want to only put numerical values in our table
+    for row in rows:
+
+        del row['graphs']
+
+    return rows
 
 def get_column_names_and_values_from_sql_model_instance(sql_model_instance):
     """Extracts column names and associated values from and sqlalchemy model
