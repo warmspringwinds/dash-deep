@@ -1,14 +1,15 @@
 import dash_html_components as html
 import dash_core_components as dcc
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, Event
 
 from dash_deep.app import app, task_manager
 from dash_deep.sql import (get_column_names_and_values_from_sql_model_instance,
                            get_column_names_from_sql_model_class)
 
-import dash_table_experiments as dt
 from dash_deep.app import db
+import dash_table_experiments as dt
 from dash_deep.plot import create_mutual_plot
+from dash_deep.sql import generate_table_contents_from_sql_model_class
 
 
 def generate_widjet_from_form(form):
@@ -141,70 +142,85 @@ def generate_main_page_scripts_widjet(script_files_title_names, script_files_url
 
 
 def generate_script_results_widjet(script_sql_class):
+    """Generates a script's result page widjet where we can inspect all results.
+    
+    Extracts all the records of a specified sqlalchemy class and puts them
+    in a dash's data table + adds graph object where the loss and accuracy
+    can be interactively inspected.
+    
+    Here we have a data table which can be refreshed by pressing the button --
+    we reload all the records on button press event. Also, there is an interval
+    object that updates the graph which contains the graphs of currently selected
+    records in data table by user. Interval can be turned off by pressing radio button.
+    This is needed in case we want to use the graph's advanced features like legends
+    selection -- allows to leave out only selected curves ( this is not possible if we
+    keep updating the graph with an interval).
+    
+    Parameters
+    ----------
+    script_sql_class : sqlalchemy class
+        Sql alchemy class to extract all the records from.
+    
+    Returns
+    -------
+    layout : dash.html.Div
+        dash.html.Div object containing the script results widjet
+    """
     
     script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
     interval_object_name_id = script_type_name_id + '-update-interval'
-    output_object_name_id = script_type_name_id + '-output-interval'
     button_id = script_type_name_id + '-button'
     graph_id_name = script_type_name_id + '-graph'
+    data_table_id = script_type_name_id + '-datatable'
+    radio_button_id = script_type_name_id + '-radio-button'
     
+    initial_table_contents = generate_table_contents_from_sql_model_class(script_sql_class)
     
     layout = html.Div([
 
             html.H1(script_sql_class.title),
             dcc.Interval(id=interval_object_name_id, interval=1000),
-            html.Div(id=output_object_name_id),
             dcc.Graph(
-                      id='graph_id_name',
+                      id=graph_id_name,
                       figure={'data':[], 'layout': []}
                      ),
+            dcc.RadioItems(id=radio_button_id,
+                           value=1000,
+                           options=[
+                                {'label': 'Graph live update on', 'value': 1000},
+                                {'label': 'Graph live update off', 'value': 60*60*1000} # One hour -- max possible interval. Now way to just turn off the interval, so we apply this hack
+                            ]),
             dt.DataTable(
-                         rows=[{}],
-                         id='datatable',
+                         rows=initial_table_contents,
+                         id=data_table_id,
                          row_selectable=True,
                          filterable=True,
                          ),
             html.Button('Refresh Table', id=button_id)
     ])
-    
-    
+        
     @app.callback(
-    Output('datatable', 'rows'),
+    Output(data_table_id, 'rows'),
     [Input(button_id, 'n_clicks')])
     def callback(n_clicks):
     
-        # Check on if we have created tables already
-        # TODO: should be probably a better way
-        experiments = []
-
-        if db.engine.has_table(script_sql_class.__tablename__):
-
-            experiments = script_sql_class.query.all()
-
-        # TODO: update the sql query to fetch
-        # all field except the graphs'
-        rows = []
-
-        for experiment in experiments:
-
-            rows.append( get_column_names_and_values_from_sql_model_instance(experiment) )
-
-        for row in rows:
-
-            del row['graphs']
+        rows = generate_table_contents_from_sql_model_class(script_sql_class)
         
         return rows
     
-    
     @app.callback(
-    Output('graph_id_name', 'figure'),
-    [Input('datatable', 'rows'),
-     Input('datatable', 'selected_row_indices'),
+    Output(graph_id_name, 'figure'),
+    [Input(data_table_id, 'rows'),
+     Input(data_table_id, 'selected_row_indices'),
      Input(interval_object_name_id, 'n_intervals')])
     def callback(rows, selected_row_indices, n_intervals):
         
         print(rows)
         print(selected_row_indices)
+        
+        if not selected_row_indices:
+            
+            return {'data':[], 'layout':[]}
         
         selected_experiments = map(lambda selected_row_index: rows[selected_row_index], selected_row_indices)
         
@@ -215,6 +231,14 @@ def generate_script_results_widjet(script_sql_class):
         mutual_plot = create_mutual_plot(extracted_rows)
         
         return mutual_plot
-
+    
+    
+    @app.callback(
+    Output(interval_object_name_id, 'interval'),
+    [Input(radio_button_id, 'value')])
+    def update_interval(value):
+        
+        return value
+    
     
     return layout
