@@ -1,6 +1,7 @@
 from plotly import tools
 import plotly.plotly as py
 import plotly.graph_objs as go
+from copy import deepcopy
 
 
 class BaseSegmentationGraph():
@@ -54,4 +55,68 @@ class BaseSegmentationGraph():
         self.validation_loss_history = self.figure_obj['data'][1]
         self.training_accuracy_history = self.figure_obj['data'][2]
         self.validation_accuracy_history = self.figure_obj['data'][3]
+
         
+def create_model_plot_with_unique_legends(sql_model_instance):
+    """Extracts the plot object form sql model instance and adds unique
+    id onto its legends.
+    
+    Extracts the figure object that can be passed to dash.Graph object
+    and displayed. Adds a unique ID (which is acquired from sql model instance
+    database ID) to its legends. This is useful when the figure needs to be
+    combined with figures of other sql model instances, otherwise it is impossible
+    to differentiate between objects in the figure.
+    
+    Parameters
+    ----------
+    sql_model_instance : instance of sqlalchemy model
+        Instance of sqlalchemy model.
+    
+    Returns
+    -------
+    model_plot : dict
+        Dict representing the plotly's figure.
+        Can be passed to dash's graph object.
+    """
+    
+    model_plot = deepcopy(sql_model_instance.graphs.figure_obj)
+    
+    for trace in model_plot['data']:
+    
+        trace['name'] = trace['name'] + " (Experiment ID: {})".format(sql_model_instance.id)
+                          
+    return model_plot
+
+                          
+def create_mutual_plot(sql_model_instances):
+    """Creates a mutual figure for multiple sql model instances of the same type.
+    
+    Extracts figures from each sql models instance and adds ID number of
+    the model to legends of each figure. This way curves of of different
+    sql model instances can be differentiated.
+    
+    Parameters
+    ----------
+    sql_model_instances : list
+        List of instances of sqlalchemy model
+    
+    Returns
+    -------
+    mutual_figure : dict
+        Dict representing the plotly's figure.
+        Can be passed to dash's graph object.
+    """
+    
+    mutual_figure = {'data':[], 'layout': []}
+    
+    if sql_model_instances:
+        
+        mutual_figure = create_model_plot_with_unique_legends(sql_model_instances[0])
+    
+    for sql_model_instance in sql_model_instances[1:]:
+        
+        current_model_plot_with_unique_legends = create_model_plot_with_unique_legends(sql_model_instance)
+        
+        mutual_figure['data'] = mutual_figure['data'] + current_model_plot_with_unique_legends['data']
+    
+    return mutual_figure
