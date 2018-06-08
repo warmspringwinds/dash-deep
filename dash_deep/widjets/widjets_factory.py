@@ -8,6 +8,7 @@ from dash_deep.sql import (get_column_names_and_values_from_sql_model_instance,
 
 import dash_table_experiments as dt
 from dash_deep.app import db
+from dash_deep.plot import create_mutual_plot
 
 
 def generate_widjet_from_form(form):
@@ -181,16 +182,9 @@ def generate_script_results_widjet(script_sql_class):
         
         extracted_rows = script_sql_class.query.filter(script_sql_class.id.in_(selected_experiment_ids)).all()
         
-        print(extracted_rows)
+        mutual_plot = create_mutual_plot(extracted_rows)
         
-        figure = {'data':[], 'layout': []}
-        
-        if extracted_rows:
-            
-            first = extracted_rows[0]
-            figure = first.graphs.figure_obj
-        
-        return figure
+        return mutual_plot
 
     script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
     interval_object_name_id = script_type_name_id + '-update-interval'
