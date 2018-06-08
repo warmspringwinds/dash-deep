@@ -142,36 +142,66 @@ def generate_main_page_scripts_widjet(script_files_title_names, script_files_url
 
 def generate_script_results_widjet(script_sql_class):
     
-    column_names = get_column_names_from_sql_model_class(script_sql_class)
+    script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
+    interval_object_name_id = script_type_name_id + '-update-interval'
+    output_object_name_id = script_type_name_id + '-output-interval'
+    button_id = script_type_name_id + '-button'
+    graph_id_name = script_type_name_id + '-graph'
     
-    experiments = []
     
-    if db.engine.has_table(script_sql_class.__tablename__):
+    layout = html.Div([
+
+            html.H1(script_sql_class.title),
+            dcc.Interval(id=interval_object_name_id, interval=1000),
+            html.Div(id=output_object_name_id),
+            dcc.Graph(
+                      id='graph_id_name',
+                      figure={'data':[], 'layout': []}
+                     ),
+            dt.DataTable(
+                         rows=[{}],
+                         id='datatable',
+                         row_selectable=True,
+                         filterable=True,
+                         ),
+            html.Button('Refresh Table', id=button_id)
+    ])
+    
+    
+    @app.callback(
+    Output('datatable', 'rows'),
+    [Input(button_id, 'n_clicks')])
+    def callback(n_clicks):
+    
+        # Check on if we have created tables already
+        # TODO: should be probably a better way
+        experiments = []
+
+        if db.engine.has_table(script_sql_class.__tablename__):
+
+            experiments = script_sql_class.query.all()
+
+        # TODO: update the sql query to fetch
+        # all field except the graphs'
+        rows = []
+
+        for experiment in experiments:
+
+            rows.append( get_column_names_and_values_from_sql_model_instance(experiment) )
+
+        for row in rows:
+
+            del row['graphs']
         
-        experiments = script_sql_class.query.all()
+        return rows
     
-    rows = []
-    
-    for experiment in experiments:
-        
-        rows.append( get_column_names_and_values_from_sql_model_instance(experiment) )
-        
-    for row in rows:
-        
-        del row['graphs']
-    
-    table = dt.DataTable(
-        rows=rows,
-        id='datatable',
-        row_selectable=True,
-        filterable=True,
-    )
     
     @app.callback(
     Output('graph_id_name', 'figure'),
     [Input('datatable', 'rows'),
-     Input('datatable', 'selected_row_indices')])
-    def callback(rows, selected_row_indices):
+     Input('datatable', 'selected_row_indices'),
+     Input(interval_object_name_id, 'n_intervals')])
+    def callback(rows, selected_row_indices, n_intervals):
         
         print(rows)
         print(selected_row_indices)
@@ -186,24 +216,5 @@ def generate_script_results_widjet(script_sql_class):
         
         return mutual_plot
 
-    script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
-    interval_object_name_id = script_type_name_id + '-update-interval'
-    output_object_name_id = script_type_name_id + '-output-interval'
-    button_id_template = script_type_name_id + '-button-{}'
-    graph_id_name = script_type_name_id + '-graph'
-    
-    graph = dcc.Graph(
-                       id='graph_id_name',
-                       figure={'data':[], 'layout': []}
-                      )
-
-    layout = html.Div([
-
-            html.H1(script_sql_class.title),
-            dcc.Interval(id=interval_object_name_id, interval=1000),
-            html.Div(id=output_object_name_id),
-            graph,
-            table
-    ])
     
     return layout
