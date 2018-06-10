@@ -1,14 +1,15 @@
-from dash_deep.app import db
+from dash_deep.logging import Experiment
 
 from time import sleep
 import click
 
 import torch
+from random import random
 
 # TODO: click for some reason ignores newline characters so we had to use
 # more break symbols than necessary
 
-def run(batch_size, learning_rate):
+def run(sql_db_model):
     """ Runs an imagenet training experiment.
     
     A dummy experiment that demonstrates an application
@@ -29,15 +30,19 @@ def run(batch_size, learning_rate):
         Lerning rate to be used by optimization algorithm.
     """
     
+    experiment = Experiment(sql_db_model)
     
-    epochs = range(30)
-    
-    # Creates a progress bar.
-    #with click.progressbar(epochs) as epochs:
-        
+    epochs = range(50)
+            
     for epoch in epochs:
-
-        sleep(1)
+        
+        
+        experiment.add_next_iteration_results(random(),
+                                              random(),
+                                              random(),
+                                              random())
+        sleep(5)
     
+    experiment.finish()
     
     return 'success'
