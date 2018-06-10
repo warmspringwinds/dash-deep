@@ -27,6 +27,8 @@ scripts_input_form_cli_interfaces = generate_scripts_input_form_cli_interfaces(w
 
 endovis_history_layout = widjets_factory.generate_script_results_widjet(scripts_db_models[0])
 
+imagenet_history_layout = widjets_factory.generate_script_results_widjet(scripts_db_models[1])
+
 
 
 # TODO: factor out into a separate function?
@@ -57,6 +59,8 @@ index_page = html.Div([
     dcc.Link('Training script parsing', href='/scripts'),
     html.Br(),
     dcc.Link('Endovis Binary History', href='/history'),
+    html.Br(),
+    dcc.Link('Imagenet History', href='/imagenet')
 ])
 
 
@@ -100,6 +104,10 @@ def display_page(pathname):
     elif pathname == '/history':
         
         return endovis_history_layout
+    
+    elif pathname == '/imagenet':
+        
+        return imagenet_history_layout
     
     else:
         
