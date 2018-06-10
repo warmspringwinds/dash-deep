@@ -121,6 +121,11 @@ def generate_script_wtform_instances(scripts_db_models):
         # once the form is validated
         script_wtform_class_instance.actions = script_db_model.actions
         
+        # Also saving the class of the sql model so that
+        # we can create instance of it and fill out with the values
+        # of filled-out-by-the-user form.
+        script_wtform_class_instance.sql_model_class = script_db_model
+        
         return script_wtform_class_instance
     
     script_wtform_class_instances = map(lambda script_db_model: get_wtform_script_class_instance(script_db_model),
