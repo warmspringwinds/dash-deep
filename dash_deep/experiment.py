@@ -17,7 +17,7 @@ class Experiment():
         
         # Making an initial commit to the database
         self.db.session.add(self.sql_model_instance)
-        self.commit()
+        self.db.session.commit()
         
     def add_next_iteration_results(self, *args, **kwargs):
         
