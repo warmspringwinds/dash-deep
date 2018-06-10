@@ -23,7 +23,7 @@ import pebble.pool.process
 
 pebble.pool.process.launch_process = launch_process_patched
 
-
+from dash_deep.app import db
 
 class TaskManager():
     
@@ -67,8 +67,12 @@ class TaskManager():
         # should be defined in the experiment model, but we had and idea
         # to use multiple names like 'initiate', 'run', 'conclude', 'on_error' which can
         # be run before, during, after, in case of error successful execution of a specified task
+                
+        sql_model_instance = form.sql_model_class()
+        form.populate_obj(sql_model_instance)
+        
         future_obj = self.process_pool.schedule(form.actions['main'],
-                                                kwargs=form.data)
+                                                args=[sql_model_instance])
         
         self.tasks_list.append(future_obj)
    
