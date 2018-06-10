@@ -4,10 +4,11 @@ import plotly.graph_objs as go
 from copy import deepcopy
 
 
-class BaseSegmentationGraph():
+class BaseGraph():
     
-    
-    def __init__(self, height=600, width=1000):
+    def __init__(self):
+        
+        self.iteration_counter = 0
         
         # Creating two subplots with two columns
         figure_obj = tools.make_subplots(rows=1, cols=2,
@@ -55,7 +56,27 @@ class BaseSegmentationGraph():
         self.validation_loss_history = self.figure_obj['data'][1]
         self.training_accuracy_history = self.figure_obj['data'][2]
         self.validation_accuracy_history = self.figure_obj['data'][3]
+    
+    
+    def add_next_iteration_results(self,
+                                   training_loss,
+                                   validation_loss,
+                                   training_accuracy,
+                                   validation_accuracy):
+        
+        
+        self.training_loss_history['x'].append(self.iteration_counter)
+        self.validation_loss_history['x'].append(self.iteration_counter)
+        self.training_accuracy_history['x'].append(self.iteration_counter)
+        self.validation_accuracy_history['x'].append(self.iteration_counter)
+        self.iteration_counter += 1
+        
+        self.training_loss_history['y'].append(training_loss)
+        self.validation_loss_history['y'].append(validation_loss)
+        self.training_accuracy_history['y'].append(training_accuracy)
+        self.validation_accuracy_history['y'].append(validation_accuracy)
 
+        
         
 def create_model_plot_with_unique_legends(sql_model_instance):
     """Extracts the plot object form sql model instance and adds unique
