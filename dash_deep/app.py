@@ -14,11 +14,9 @@ import os
 import pkgutil
 import importlib
 
-from dash_deep.task import TaskManager
-
 import click
 
-task_manager = TaskManager()
+
 
 
 server = Flask(__name__)
@@ -66,6 +64,10 @@ import dash_deep.cli.default_commands
 # Initializing the Dash application
 
 app = dash.Dash(__name__, server=server)
+
+from dash_deep.task import TaskManager
+
+task_manager = TaskManager()
 
 
 # Since we're adding callbacks to elements that don't exist in the app.layout,
