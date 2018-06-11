@@ -17,7 +17,14 @@ def generate_table_from_future_objects(future_objects):
         List of dicts that represent table rows.
     """
     
-    table = map(lambda future_object: generate_table_row_from_future_object(future_object), future_objects)
+    table = []
+    
+    for index, future_object in enumerate(future_objects):
+        
+        table_row = generate_table_row_from_future_object(future_object)
+        table_row['id'] = index
+        table.append(table_row)
+        
     
     return table
 

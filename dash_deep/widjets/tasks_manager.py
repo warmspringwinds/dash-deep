@@ -11,21 +11,20 @@ layout = html.Div([
             html.H1('Tasks Management'),
 
             html.H1('Active Tasks'),
-    
-            dcc.Interval(id='active-tasks-state-update-interval', interval=1000),
             dt.DataTable(
                          rows=[{}],
                          id='tasks-data-table',
                          row_selectable=True,
                          filterable=True,
-                         )
+                         ),
+            html.Button('Refresh Table', id='tasks-table-refresh-button')
 ])
 
 
 @app.callback(
     Output('tasks-data-table', 'rows'),
-    [Input('active-tasks-state-update-interval', 'n_intervals')])
-def display_output(n):
+    [Input('tasks-table-refresh-button', 'n_clicks')])
+def display_output(n_clicks):
     
     table_contents = generate_table_from_future_objects(task_manager.tasks_list) 
     
