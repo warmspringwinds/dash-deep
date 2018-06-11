@@ -57,12 +57,12 @@ def generate_table_row_from_future_object(future_object):
     
     table_row_dict['errors'] = 'None'
     
-    if future_object.done():
+#     if future_object.done():
         
-        exception = future_object.exception()
+#         exception = future_object.exception()
         
-        if exception:
+#         if exception:
             
-            table_row_dict['errors'] = exception
+#             table_row_dict['errors'] = exception
     
     return table_row_dict

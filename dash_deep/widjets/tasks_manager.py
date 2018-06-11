@@ -9,16 +9,34 @@ from dash_deep.future import generate_table_from_future_objects
 layout = html.Div([
     
             html.H1('Tasks Management'),
-
-            html.H1('Active Tasks'),
             dt.DataTable(
                          rows=[{}],
                          id='tasks-data-table',
                          row_selectable=True,
                          filterable=True,
                          ),
-            html.Button('Refresh Table', id='tasks-table-refresh-button')
+            html.Button('Refresh Table', id='tasks-table-refresh-button'),
+            html.Button('Cancel/Delete', id='tasks-table-refresh-button'),
+            html.Div(id='tasks-table-dummy-output')
 ])
+
+@app.callback(
+    Output('tasks-table-dummy-output', 'children'),
+    [Input('tasks-data-table', 'rows'),
+     Input('tasks-data-table', 'selected_row_indices')])
+def callback(rows, selected_row_indices):
+
+    print(rows)
+    print(selected_row_indices)
+    
+    selected_tasks_ids = map(lambda selected_row_index: rows[selected_row_index]['id'], selected_row_indices)
+    
+    for selected_task_id in selected_tasks_ids:
+        
+        task_manager.tasks_list[selected_task_id].cancel()
+        
+
+    return ''
 
 
 @app.callback(
