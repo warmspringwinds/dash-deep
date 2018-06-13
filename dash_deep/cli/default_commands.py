@@ -2,8 +2,9 @@ import click
 from dash_deep.app import server, db
 from dash_deep.sql import create_dummy_endovis_records
 
+# with_appcontext=False because we have server and db as global variables
 
-@server.cli.command()
+@server.cli.command(with_appcontext=False)
 @click.argument('host', default='0.0.0.0')
 @click.argument('port', default='5000')
 def run_server(port, host):
@@ -16,7 +17,7 @@ def run_server(port, host):
     
     server.run(port=port, host=host)
     
-@server.cli.command()
+@server.cli.command(with_appcontext=False)
 def drop_database():
     """Drops all tables related to experiments results.
     
@@ -27,7 +28,7 @@ def drop_database():
     
     db.drop_all()
     
-@server.cli.command()
+@server.cli.command(with_appcontext=False)
 def initiate_database():
     """Initiates all tables related to experiments.
     
@@ -39,7 +40,7 @@ def initiate_database():
     db.create_all()
 
     
-@server.cli.command()
+@server.cli.command(with_appcontext=False)
 def populate_database():
     """Populates database with dummy data.
     
