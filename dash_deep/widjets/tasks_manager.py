@@ -2,7 +2,7 @@ from dash_deep.app import app, task_manager
 
 import dash_html_components as html
 import dash_core_components as dcc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_table_experiments as dt
 from dash_deep.future import generate_table_from_future_objects
 
@@ -16,15 +16,16 @@ layout = html.Div([
                          filterable=True,
                          ),
             html.Button('Refresh Table', id='tasks-table-refresh-button'),
-            html.Button('Cancel/Delete', id='tasks-table-refresh-button'),
+            html.Button('Cancel/Delete', id='tasks-table-cancel-button'),
             html.Div(id='tasks-table-dummy-output')
 ])
 
 @app.callback(
     Output('tasks-table-dummy-output', 'children'),
-    [Input('tasks-data-table', 'rows'),
-     Input('tasks-data-table', 'selected_row_indices')])
-def callback(rows, selected_row_indices):
+    [Input('tasks-table-cancel-button', 'n_clicks')],
+     [State('tasks-data-table', 'selected_row_indices'),
+      State('tasks-data-table', 'rows')])
+def callback(n_clicks, selected_row_indices, rows):
 
     print(rows)
     print(selected_row_indices)
