@@ -67,6 +67,6 @@ def generate_table_row_from_future_object(future_object):
         
         if exception:
             
-            table_row_dict['errors'] = exception
+            table_row_dict['errors'] = exception.message
     
     return table_row_dict
