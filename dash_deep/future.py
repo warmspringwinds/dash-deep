@@ -57,12 +57,16 @@ def generate_table_row_from_future_object(future_object):
     
     table_row_dict['errors'] = 'None'
     
-#     if future_object.done():
+    # If we call .exception() on a future object that was
+    # cancelled, it will raise an exception, this is why
+    # we also check for that. Cancelled processes usually
+    # don't have exceptions
+    if future_object.done() and (not future_object.cancelled()):
         
-#         exception = future_object.exception()
+        exception = future_object.exception()
         
-#         if exception:
+        if exception:
             
-#             table_row_dict['errors'] = exception
+            table_row_dict['errors'] = exception
     
     return table_row_dict
