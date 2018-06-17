@@ -37,6 +37,10 @@ if not os.path.exists(database_path):
 
 server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + database_file_location
 
+# Uncomment this to display all sql queries that
+# are being executed
+#server.config['SQLALCHEMY_ECHO'] = True
+
 # Just temporary removes warning messages
 # TODO: explore more on what this option actually does
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
