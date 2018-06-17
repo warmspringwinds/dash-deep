@@ -46,8 +46,8 @@ class ImagenetClassification(db.Model):
     title = 'Imagenet Classification'
     id = db.Column(db.Integer, primary_key=True)
     
-    batch_size = db.Column(db.String(80), nullable=False)
-    learning_rate = db.Column(db.String(120), nullable=False)
+    batch_size = db.Column(db.Integer, nullable=False)
+    learning_rate = db.Column(db.Float, nullable=False)
     
     graphs = db.Column(db.PickleType())
     
