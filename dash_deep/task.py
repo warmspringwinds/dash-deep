@@ -67,9 +67,31 @@ class TaskManager():
         # should be defined in the experiment model, but we had and idea
         # to use multiple names like 'initiate', 'run', 'conclude', 'on_error' which can
         # be run before, during, after, in case of error successful execution of a specified task
-                
+        
+        # Creating a new sql model instance
         sql_model_instance = form.sql_model_class()
+        
+        # Populating the instance with the values from a filled-out form
         form.populate_obj(sql_model_instance)
+        
+        # Adding the new instance to the session and saving it to a database
+        db.session.add(sql_model_instance)
+        db.session.commit()
+        
+        # Since .commit() marks all fields of instances as 'expired'
+        # we need to refresh all fields. It also has a nice side-effect
+        # that values get coerced to a correct type from a string (Since
+        # all values in our filled-out form are strings).
+        db.session.refresh(sql_model_instance)
+        
+        # Detaching our object from a session, since we need to pass it
+        # to another process and connect to the session of that session.
+        # We also use this detached instance to display the id of the experiment
+        # in the 'active tasks' table.
+        db.session.expunge(sql_model_instance)
+        
+        # TODO: add additional field to the  stored future objects that will
+        # store the detached instace of sql model.
         
         future_obj = self.process_pool.schedule(form.actions['main'],
                                                 args=[sql_model_instance])
