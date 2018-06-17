@@ -30,7 +30,11 @@ def run(sql_db_model):
         Lerning rate to be used by optimization algorithm.
     """
     
+    print( type(sql_db_model.batch_size) )
+    
     experiment = Experiment(sql_db_model)
+    
+    print(type(experiment.sql_model_instance.batch_size))
     
     epochs = range(50)
             
