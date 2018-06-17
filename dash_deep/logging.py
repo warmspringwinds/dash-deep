@@ -6,7 +6,7 @@ class Experiment():
     
     def __init__(self, sql_model_instance):
         
-        self.sql_model_instance = sql_model_instance
+        #self.sql_model_instance = sql_model_instance
         
         # Since experiment will be most probably run in a separate,
         # process, we need to take appropriate actions to prevent different
@@ -15,9 +15,10 @@ class Experiment():
         db.engine.dispose()
         self.db = db
         
-        # Making an initial commit to the database
-        self.db.session.add(self.sql_model_instance)
-        self.db.session.commit()
+        # Attaching the detached instance of sql model class to our session
+        # Each process usually has its own session and we attach this object to it.
+        self.sql_model_instance = self.db.session.merge(sql_model_instance)
+        
         
     def add_next_iteration_results(self, *args, **kwargs):
         
