@@ -41,10 +41,10 @@ def run(sql_db_model):
     for epoch in epochs:
         
         
-        experiment.add_next_iteration_results(random(),
-                                              random(),
-                                              random(),
-                                              random())
+        experiment.add_next_iteration_results(training_loss=random(),
+                                              training_accuracy=random(),
+                                              validation_accuracy=random(),
+                                              validation_loss=random())
         sleep(5)
     
     experiment.finish()

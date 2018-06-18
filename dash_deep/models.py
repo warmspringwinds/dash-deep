@@ -51,9 +51,21 @@ class ImagenetClassification(db.Model):
     
     graphs = db.Column(db.PickleType())
     
+    training_loss = db.Column(db.Float, nullable=False)
+    training_accuracy = db.Column(db.Float, nullable=False)
+    validation_loss = db.Column(db.Float, nullable=False)
+    validation_accuracy = db.Column(db.Float, nullable=False)
+    
+    graph_definition = [ 
+                           [ ('Losses', ['training_loss', 'validation_loss']),
+                             ('Accuracy', ['training_accuracy', 'validation_accuracy']) ]
+                       ]
+    
     actions = {'main': imagenet_classification_train_run}
     
-    exclude_from_form = ['graphs']
+    exclude_from_form = ['graphs',
+                         'training_loss','training_accuracy',
+                         'validation_loss', 'validation_accuracy']
     
     def __init__(self, *args, **kwargs):
         
@@ -61,7 +73,13 @@ class ImagenetClassification(db.Model):
         
         self.batch_size = 100
         self.learning_rate = 0.0001
-        self.graphs = BaseGraph()
+        
+        self.training_loss = 0.0
+        self.training_accuracy = 0.0
+        self.validation_loss = 0.0
+        self.validation_accuracy = 0.0
+        
+        self.graphs = BaseGraph(self.graph_definition)
     
     def __repr__(self):
         
