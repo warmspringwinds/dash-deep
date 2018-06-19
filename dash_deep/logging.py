@@ -33,6 +33,20 @@ class Experiment():
         self.db.session.add(self.sql_model_instance)
         self.db.session.commit()
     
+    
+    def update_best_iteration_results(self, **kwargs):
+        
+        column_names = self.sql_model_instance.graphs.graph_column_names
+        
+        for key, value in kwargs.iteritems():
+            
+            if key in column_names:
+                
+                setattr(self.sql_model_instance, key, value)
+        
+        self.db.session.add(self.sql_model_instance)
+        self.db.session.commit()
+    
     def finish(self):
         
         # Compute the best results for each metric using graph object:
