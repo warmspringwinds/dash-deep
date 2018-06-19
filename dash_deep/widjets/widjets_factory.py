@@ -174,7 +174,7 @@ def generate_script_results_widjet(script_sql_class):
     data_table_id = script_type_name_id + '-datatable'
     radio_button_id = script_type_name_id + '-radio-button'
     
-    initial_table_contents = generate_table_contents_from_sql_model_class(script_sql_class)
+    #initial_table_contents = generate_table_contents_from_sql_model_class(script_sql_class)
     
     layout = html.Div([
 
@@ -191,7 +191,7 @@ def generate_script_results_widjet(script_sql_class):
                                 {'label': 'Graph live update off', 'value': 60*60*1000} # One hour -- max possible interval. Now way to just turn off the interval, so we apply this hack
                             ]),
             dt.DataTable(
-                         rows=initial_table_contents,
+                         rows=[{}],#initial_table_contents,
                          id=data_table_id,
                          row_selectable=True,
                          filterable=True,
