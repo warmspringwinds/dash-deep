@@ -3,8 +3,24 @@ from sqlalchemy.orm.attributes import flag_modified
 
 
 class Experiment():
+    """Helper class that accepts the filled-out sql alchemy model
+    instance and takes care of database connection in a newly created
+    process. It also provides methods to easily append new values to the
+    graph and update the current best results.
+    
+    """
     
     def __init__(self, sql_model_instance):
+        """Initializes the new experiment instance from a populated
+        sql alchemy model instance which is being provided to a function
+        specified by user in the models.py module. The sql alchemy model
+        instance is populated by user though the our provided gui.
+    
+        Parameters
+        ----------
+        sql_model_instance : sql alchemy model instance
+            Sql alchemy model instace from models.py module.
+        """
         
         #self.sql_model_instance = sql_model_instance
         
@@ -21,6 +37,16 @@ class Experiment():
         
         
     def add_next_iteration_results(self, *args, **kwargs):
+        """Adds new values to populate the graph of the experiment with.
+        The named arguments are equivalent to the trace names specified
+        in the sql alchemy model definition in the models.py module.
+    
+        Parameters
+        ----------
+        kwargs : Named arguments
+            Named arguments representing new values to append
+            to the traces of the graph of the experiment.
+        """
         
         # Passing all the parameters to the graph object
         # which upates the internal state of the graph
@@ -35,6 +61,16 @@ class Experiment():
     
     
     def update_best_iteration_results(self, **kwargs):
+        """Updates values of the best results of trace
+        values so far. Named arguments are equivalent to
+        the ones in the add_next_iteration_results() method.
+    
+        Parameters
+        ----------
+        kwargs : Named arguments
+            Named arguments representing the column
+            names defined in the models.py
+        """
         
         column_names = self.sql_model_instance.graphs.graph_column_names
         
@@ -49,9 +85,8 @@ class Experiment():
     
     def finish(self):
         
-        # Compute the best results for each metric using graph object:
-        # like highest accuracy + lowest loss -- and write them down
-        # into database
+        # TODO: add additional field to the models -- finished
+        # and equate it to True on the completion of the exepriment.
         
         # Should we close the db session?
         
