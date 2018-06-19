@@ -37,6 +37,11 @@ def run(sql_db_model):
     print(type(experiment.sql_model_instance.batch_size))
     
     epochs = range(50)
+    
+    experiment.update_best_iteration_results(training_loss=100,
+                                             training_accuracy=100,
+                                             validation_accuracy=100,
+                                             validation_loss=100)
             
     for epoch in epochs:
         
@@ -46,6 +51,8 @@ def run(sql_db_model):
                                               validation_accuracy=random(),
                                               validation_loss=random())
         sleep(5)
+    
+    
     
     experiment.finish()
     
