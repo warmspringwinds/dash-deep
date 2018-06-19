@@ -5,19 +5,96 @@ from copy import deepcopy
 
 
 def convert_column_name_to_legend_name(column_name):
+    """Converts a column variable name in underscore notation into a plot's
+    legend name.
+    
+    Replaces underscores with spaces and capitalizes the input variable
+    name. For example, 'validation_score' -> 'Validation score'.
+    
+    Parameters
+    ----------
+    column_name : string
+        String representing the variable name.
+    
+    Returns
+    -------
+    legend_name : string
+        String representing the legend name.
+    """
     
     return column_name.replace('_', ' ').capitalize()
 
 
 def flatten_list(two_dimensional_list):
+    """Flattens 2D nested list.
+    
+    See more here:
+    https://stackoverflow.com/questions/952914/making-a-flat-list-out-of-list-of-lists-in-python
+    
+    This operation is necessary because plotly's API accepts titles
+    for a created graph with subplots as a flattened list of positions of subplots.
+    
+    Parameters
+    ----------
+    two_dimensional_list : list of lists
+        List of lists.
+    
+    Returns
+    -------
+    flattened : list
+        Flattened list.
+    """
     
     flattened = [item for sublist in two_dimensional_list for item in sublist]
     
     return flattened
 
+
 class BaseGraph():
+    """Class that takes care of storing of Plotly's dict representation
+    of a graph with subplots.
+    
+    The class accepts the graph definition with subplots titles and 
+    traces legend names that each subplot contains. We store the dict
+    representation because original plotly's representation of a graph
+    is not serializable and therefore we can't store it in a pickle format.
+    
+    """
     
     def __init__(self, graph_definition):
+        """Accepts the graph definition dict, creates plotly's graph object
+        from it and converts it into a dict representation which is being stored
+        internally. Instances of this classes are serializable and can be stored
+        in a pickle column type in sqlalchemy.
+        
+        About the graph definition rules:
+        
+        It's a 2D nested list where each element represents subplot.
+        
+        For example:
+        
+        graph_definition = [ 
+                               [ ('Losses', ['training_loss', 'validation_loss']),
+                                 ('Accuracy', ['training_accuracy', 'validation_accuracy']) ]
+                           ]
+                           
+        Defines a graph with with one row and two columns of subplots.
+        
+        Each subplot is represented by tuple where the first element is desired title of the
+        subplot. Second element is a list of legend names for traces that will be displaed
+        in this subplot. In our example, ('Losses', ['training_loss', 'validation_loss']) will
+        have a title of 'Losses' and two traces 'training_loss' and 'validation_loss'.
+        The class has a method add_next_iteration_results() which accepts named arguments that
+        will append new values to the repective traces.
+        
+        
+
+        Parameters
+        ----------
+        graph_definition : list
+            List with the graph definition
+
+        """
         
         self.iteration_counter = 0
         
@@ -79,6 +156,28 @@ class BaseGraph():
     
     
     def add_next_iteration_results(self, **kwargs):
+        """Appends next values to traces of the graph object.
+    
+        The function accepts the named arguments -- where
+        names are the same as provided in the graph definition for
+        traces.
+        
+        For this example:
+        
+        graph_definition = [ 
+                               [ ('Losses', ['training_loss', 'validation_loss']),
+                                 ('Accuracy', ['training_accuracy', 'validation_accuracy']) ]
+                           ]
+        Named arguments will be 'training_loss', 'validation_loss',
+        'training_accuracy', 'validation_accuracy'.
+
+        Parameters
+        ----------
+        kwargs : Named arguments
+            Named arguments representing traces to append
+            with new values.
+
+        """
         
         # Updating the counter for each trace
         for current_trace in self.graph_column_name_trace_mapping.values():
