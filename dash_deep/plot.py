@@ -96,7 +96,7 @@ class BaseGraph():
 
         """
         
-        self.iteration_counter = 0
+        self.subplot_trace_iteration_counters = {}
         
         # Inferring the number the size of
         # our figure with subplots
@@ -128,7 +128,7 @@ class BaseGraph():
                 
                 # Creating trace instances
                 for sublot_trace_name in current_subplot_traces_names:
-                    
+                                        
                     # Converting the column name into actual title
                     # like from validation_loss to Validation loss
                     legend_name = convert_column_name_to_legend_name(sublot_trace_name)
@@ -151,8 +151,10 @@ class BaseGraph():
         # Creating a mapping from trace name to its location in the dict representation
         # of plot.ly's Figure object
         for graph_name, trace in zip(self.graph_column_names, self.figure_obj['data']):
-
+            
+            self.subplot_trace_iteration_counters[graph_name] = 0
             self.graph_column_name_trace_mapping[graph_name] = trace
+            
     
     
     def add_next_iteration_results(self, **kwargs):
@@ -178,16 +180,13 @@ class BaseGraph():
             with new values.
 
         """
-        
-        # Updating the counter for each trace
-        for current_trace in self.graph_column_name_trace_mapping.values():
-            
-            current_trace['x'].append(self.iteration_counter)
-        
-        self.iteration_counter += 1
-        
+                
         # Appending the next step values
         for trace_name, trace_value_to_append in kwargs.iteritems():
+            
+            current_trace_iteration_counter = self.subplot_trace_iteration_counters[trace_name]
+            self.graph_column_name_trace_mapping[trace_name]['x'].append(current_trace_iteration_counter)
+            self.subplot_trace_iteration_counters[trace_name] += 1
             
             self.graph_column_name_trace_mapping[trace_name]['y'].append(trace_value_to_append)
 
