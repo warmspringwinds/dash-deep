@@ -5,20 +5,33 @@ import copy
 
 from dash_deep.scripts.endovis_binary_segmentation_train import run as endovis_binary_segmentation_train_run
 
+
 class EndovisBinary(db.Model):
     
     title = 'Endovis Binary Segmentation'
     id = db.Column(db.Integer, primary_key=True)
     
-    batch_size = db.Column(db.String(80), nullable=False)
-    learning_rate = db.Column(db.String(120), nullable=False)
-    output_stride = db.Column(db.String(120), nullable=False)
+    batch_size = db.Column(db.Integer, nullable=False)
+    learning_rate = db.Column(db.Float, nullable=False)
+    output_stride = db.Column(db.Integer, nullable=False)
     
     graphs = db.Column(db.PickleType())
     
+    training_loss = db.Column(db.Float, nullable=False)
+    
+    training_accuracy = db.Column(db.Float, nullable=False)
+    validation_accuracy = db.Column(db.Float, nullable=False)
+    
+    graph_definition = [ 
+                           [ ('Losses', ['training_loss']) ],
+                           [ ('Accuracy', ['training_accuracy', 'validation_accuracy']) ]
+                       ]
+    
     actions = {'main': endovis_binary_segmentation_train_run}
     
-    exclude_from_form = ['graphs']
+    exclude_from_form = ['graphs',
+                         'training_loss',
+                         'training_accuracy', 'validation_accuracy']
     
     def __init__(self, *args, **kwargs):
         
@@ -27,7 +40,12 @@ class EndovisBinary(db.Model):
         self.batch_size = 100
         self.learning_rate = 0.0001
         self.output_stride = 8
-        self.graphs = BaseGraph()
+        
+        self.training_loss = 0.0
+        self.training_accuracy = 0.0
+        self.validation_accuracy = 0.0
+        
+        self.graphs = BaseGraph(self.graph_definition)
     
     def __repr__(self):
         
