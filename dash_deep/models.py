@@ -11,6 +11,7 @@ class EndovisBinary(db.Model):
     title = 'Endovis Binary Segmentation'
     id = db.Column(db.Integer, primary_key=True)
     
+    gpu_id = db.Column(db.Integer, nullable=False)
     batch_size = db.Column(db.Integer, nullable=False)
     learning_rate = db.Column(db.Float, nullable=False)
     output_stride = db.Column(db.Integer, nullable=False)
@@ -64,6 +65,7 @@ class ImagenetClassification(db.Model):
     title = 'Imagenet Classification'
     id = db.Column(db.Integer, primary_key=True)
     
+    gpu_id = db.Column(db.Integer, nullable=False)
     batch_size = db.Column(db.Integer, nullable=False)
     learning_rate = db.Column(db.Float, nullable=False)
     
