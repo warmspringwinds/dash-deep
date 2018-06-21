@@ -1,4 +1,4 @@
-from dash_deep.app import db
+from dash_deep.logging import Experiment
 from time import sleep
 
 import sys, os
@@ -42,27 +42,10 @@ from PIL import Image
 
 from sklearn.metrics import confusion_matrix
 
-def flatten_logits(logits, number_of_classes):
-    """Flattens the logits batch except for the logits dimension"""
-
-    logits_permuted = logits.permute(0, 2, 3, 1)
-    logits_permuted_cont = logits_permuted.contiguous()
-    logits_flatten = logits_permuted_cont.view(-1, number_of_classes)
-
-    return logits_flatten
-
-def flatten_annotations(annotations):
-
-    return annotations.view(-1)
-
-def get_valid_annotations_index(flatten_annotations, mask_out_value=255):
-
-    return torch.squeeze( torch.nonzero((flatten_annotations != mask_out_value )), 1)
 
 
-def run(batch_size,
-        learning_rate,
-        output_stride):
+
+def run(sql_db_model):
     """ Trains a Resnet-18 network on Endovis 2017.
     
     Trains a Resnet-18 network previously trained on imagenet on the
@@ -92,6 +75,32 @@ def run(batch_size,
         32 is the worst.
     """
     
+    def flatten_logits(logits, number_of_classes):
+        """Flattens the logits batch except for the logits dimension"""
+
+        logits_permuted = logits.permute(0, 2, 3, 1)
+        logits_permuted_cont = logits_permuted.contiguous()
+        logits_flatten = logits_permuted_cont.view(-1, number_of_classes)
+
+        return logits_flatten
+
+    def flatten_annotations(annotations):
+
+        return annotations.view(-1)
+
+    def get_valid_annotations_index(flatten_annotations, mask_out_value=255):
+
+        return torch.squeeze( torch.nonzero((flatten_annotations != mask_out_value )), 1)
+    
+    batch_size = sql_db_model.batch_size
+    learning_rate = sql_db_model.learning_rate
+    output_stride = sql_db_model.output_stride
+    gpu_id = sql_db_model.gpu_id
+    
+    #os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    
+    experiment = Experiment(sql_db_model)
+    
     number_of_classes = 2
 
     labels = range(number_of_classes)
@@ -107,12 +116,12 @@ def run(batch_size,
                         [None, transforms.Lambda(lambda x: torch.from_numpy(np.asarray(x)).long()) ]
                     ])
 
-    trainset = Endovis_Instrument_2017(root='/home/daniil/datasets/data',
+    trainset = Endovis_Instrument_2017(root='/home/daniil/.pytorch-segmentation-detection/datasets/endovis_2017',
                                        dataset_type=0,
                                        joint_transform=train_transform)
 
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=100,
-                                              shuffle=True, num_workers=1)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                              shuffle=True, num_workers=4)
 
     valid_transform = ComposeJoint(
                     [
@@ -123,7 +132,7 @@ def run(batch_size,
                     ])
 
 
-    valset = Endovis_Instrument_2017(root='/home/daniil/datasets/data',
+    valset = Endovis_Instrument_2017(root='/home/daniil/.pytorch-segmentation-detection/datasets/endovis_2017',
                                      dataset_type=0,
                                      joint_transform=valid_transform,
                                      train=False)
@@ -250,7 +259,7 @@ def run(batch_size,
     
     criterion = nn.CrossEntropyLoss(size_average=False).cuda()
 
-    optimizer = optim.Adam(fcn.parameters(), lr=0.0001, weight_decay=0.0001)
+    optimizer = optim.Adam(fcn.parameters(), lr=learning_rate, weight_decay=0.0001)
     
     best_validation_score = 0
     current_validation_score = 0
@@ -296,11 +305,12 @@ def run(batch_size,
             # print statistics
             running_loss += (loss.data[0] / logits_flatten_valid.size(0)) 
             if i % 2 == 1:
-
-
+                
                 loss_history.append(running_loss / 2)
                 loss_iteration_number_history.append(loss_current_iteration)
-
+                
+                experiment.add_next_iteration_results(training_loss=running_loss / 2)
+                
                 loss_current_iteration += 1
 
                 running_loss = 0.0
@@ -319,12 +329,16 @@ def run(batch_size,
         train_validation_iteration_number_history.append(train_validation_current_iteration)
 
         train_validation_current_iteration += 1
+        
+        experiment.add_next_iteration_results(training_accuracy=current_train_validation_score,
+                                              validation_accuracy=current_validation_score)
 
         # Save the model if it has a better MIoU score.
         if current_validation_score > best_validation_score:
 
-            torch.save(fcn.state_dict(), 'resnet_18_8s_best.pth')
+            #torch.save(fcn.state_dict(), 'resnet_18_8s_best.pth')
             best_validation_score = current_validation_score
+            experiment.update_best_iteration_results(validation_accuracy=current_validation_score)
     
     
     print('Finished Training')

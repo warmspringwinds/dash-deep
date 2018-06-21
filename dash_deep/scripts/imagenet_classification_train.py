@@ -36,6 +36,8 @@ def run(sql_db_model):
     
     print(type(experiment.sql_model_instance.batch_size))
     
+    tmp = torch.ones(100, 100).cuda()
+    
     epochs = range(50)
     
     experiment.update_best_iteration_results(training_loss=100,
@@ -47,9 +49,9 @@ def run(sql_db_model):
         
         
         experiment.add_next_iteration_results(training_loss=random(),
-                                              training_accuracy=random(),
-                                              validation_accuracy=random(),
-                                              validation_loss=random())
+                                              training_accuracy=random())#,
+                                              #validation_accuracy=random(),
+                                              #validation_loss=random())
         sleep(5)
     
     
