@@ -55,7 +55,7 @@ def generate_table_row_from_future_object(future_object):
     # be changed in a future -- need to investigate more
     table_row_dict['state'] = future_object._state
     
-    table_row_dict['errors'] = 'None'
+    table_row_dict['error traceback'] = 'None'
     
     # If we call .exception() on a future object that was
     # cancelled, it will raise an exception, this is why
@@ -67,6 +67,6 @@ def generate_table_row_from_future_object(future_object):
         
         if exception:
             
-            table_row_dict['errors'] = exception.message
+            table_row_dict['error traceback'] = str(exception.traceback)
     
     return table_row_dict
