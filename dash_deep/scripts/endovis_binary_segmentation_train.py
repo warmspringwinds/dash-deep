@@ -42,6 +42,24 @@ from PIL import Image
 
 from sklearn.metrics import confusion_matrix
 
+def flatten_logits(logits, number_of_classes):
+    """Flattens the logits batch except for the logits dimension"""
+
+    logits_permuted = logits.permute(0, 2, 3, 1)
+    logits_permuted_cont = logits_permuted.contiguous()
+    logits_flatten = logits_permuted_cont.view(-1, number_of_classes)
+
+    return logits_flatten
+
+
+def flatten_annotations(annotations):
+
+    return annotations.view(-1)
+
+
+def get_valid_annotations_index(flatten_annotations, mask_out_value=255):
+
+    return torch.squeeze( torch.nonzero((flatten_annotations != mask_out_value )), 1)
 
 
 
@@ -75,29 +93,13 @@ def run(sql_db_model):
         32 is the worst.
     """
     
-    def flatten_logits(logits, number_of_classes):
-        """Flattens the logits batch except for the logits dimension"""
-
-        logits_permuted = logits.permute(0, 2, 3, 1)
-        logits_permuted_cont = logits_permuted.contiguous()
-        logits_flatten = logits_permuted_cont.view(-1, number_of_classes)
-
-        return logits_flatten
-
-    def flatten_annotations(annotations):
-
-        return annotations.view(-1)
-
-    def get_valid_annotations_index(flatten_annotations, mask_out_value=255):
-
-        return torch.squeeze( torch.nonzero((flatten_annotations != mask_out_value )), 1)
     
     batch_size = sql_db_model.batch_size
     learning_rate = sql_db_model.learning_rate
     output_stride = sql_db_model.output_stride
     gpu_id = sql_db_model.gpu_id
     
-    #os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
     
     experiment = Experiment(sql_db_model)
     
