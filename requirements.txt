@@ -9,3 +9,4 @@ gpustat # A library to query gpu memory occupation and other specs
 Flask-SQLAlchemy # We use sqlalchemy to define models to store results
 WTForms # Wtforms are used to generate input forms from sqlalchemy models and user input validation
 click # We are automatically creating command line interfaces and use click library for that
+psutil
