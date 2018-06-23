@@ -1,4 +1,5 @@
 import pebble
+import psutil
 
 # Monkey-patching pebble to make its children non-daemonic
 # We need this in order to allow children to spawn processes too
@@ -18,10 +19,60 @@ def launch_process_patched(function, *args, **kwargs):
 
     return process
 
+# Patching the stop process function.
+# For some reason, when using pytorch 0.4 -- stopping the
+# main process doesn't stop the children processes spawned by dataloader.
+# This was solved in pytorch 0.5 though.
+# More about it can be found here:
+# https://github.com/pytorch/pytorch/issues/8805
+
+def stop_process_patched(process):
+    """Does its best to stop the process."""
+    
+    # Collecting the children of the process that we want
+    # to cancel -- we will try to stop them manually
+    # if stopping the process itself won't trigger it
+    
+    parent_pid = process.pid
+
+    parent = psutil.Process(parent_pid)
+
+    children = []
+
+    for child in parent.children(recursive=True):
+
+        children.append(child)
+    
+    process.terminate()
+    process.join(3)
+
+    if process.is_alive() and os.name != 'nt':
+        try:
+            os.kill(process.pid, signal.SIGKILL)
+            process.join()
+        except OSError:
+            return
+
+    if process.is_alive():
+        raise RuntimeError("Unable to terminate PID %d" % os.getpid())
+    
+    # Here we try to kill children of the process
+    # If they have already been terminated, this part
+    # will not affect anything
+    
+    for child in children:
+    
+        try:
+            child.kill()
+
+        except psutil.NoSuchProcess:
+            pass
+
 
 import pebble.pool.process
 
 pebble.pool.process.launch_process = launch_process_patched
+pebble.pool.process.stop_process = stop_process_patched
 
 from dash_deep.app import db
 
