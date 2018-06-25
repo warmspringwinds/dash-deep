@@ -34,6 +34,17 @@ class Experiment():
         # Attaching the detached instance of sql model class to our session
         # Each process usually has its own session and we attach this object to it.
         self.sql_model_instance = self.db.session.merge(sql_model_instance)
+    
+    
+    def start(self):
+        """Starts the experiment.
+        
+        The function starts the experiment by commiting the experiment
+        model instance to the database.
+        """
+        
+        self.db.session.add(self.sql_model_instance)
+        self.db.session.commit()
         
         
     def add_next_iteration_results(self, *args, **kwargs):
