@@ -1,8 +1,9 @@
 import random
-from dash_deep.app import db
 from collections import OrderedDict
-from dash_deep.models import EndovisBinary
 from sqlalchemy.orm.attributes import flag_modified
+
+import dash_deep.models
+from dash_deep.app import db
 
 
 def generate_table_contents_from_sql_model_class(sql_model_class):
@@ -140,7 +141,7 @@ def create_dummy_endovis_record():
 
         return output_list
     
-    dummy_model_instance = EndovisBinary()
+    dummy_model_instance = dash_deep.models.EndovisBinary()
     
     dummy_model_instance.batch_size = random.choice(batch_size_choices)
     dummy_model_instance.learning_rate = random.choice(learning_rate_choices)
