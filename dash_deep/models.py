@@ -38,6 +38,7 @@ class EndovisBinary(db.Model):
         
         super(EndovisBinary, self).__init__(*args, **kwargs)
         
+        self.gpu_id = 0
         self.batch_size = 100
         self.learning_rate = 0.0001
         self.output_stride = 8
@@ -91,6 +92,7 @@ class ImagenetClassification(db.Model):
         
         super(ImagenetClassification, self).__init__(*args, **kwargs)
         
+        self.gpu_id = 0
         self.batch_size = 100
         self.learning_rate = 0.0001
         
