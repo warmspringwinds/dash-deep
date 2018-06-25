@@ -1,6 +1,6 @@
 from dash_deep.app import db
 from dash_deep.plot import BaseGraph
-import copy
+from datetime import datetime
 
 
 from dash_deep.scripts.endovis_binary_segmentation_train import run as endovis_binary_segmentation_train_run
@@ -15,6 +15,8 @@ class EndovisBinary(db.Model):
     batch_size = db.Column(db.Integer, nullable=False)
     learning_rate = db.Column(db.Float, nullable=False)
     output_stride = db.Column(db.Integer, nullable=False)
+    
+    created_at = db.Column(db.DateTime, nullable=False)
     
     graphs = db.Column(db.PickleType())
     
@@ -32,7 +34,8 @@ class EndovisBinary(db.Model):
     
     exclude_from_form = ['graphs',
                          'training_loss',
-                         'training_accuracy', 'validation_accuracy']
+                         'training_accuracy', 'validation_accuracy',
+                         'created_at']
     
     def __init__(self, *args, **kwargs):
         
@@ -42,6 +45,8 @@ class EndovisBinary(db.Model):
         self.batch_size = 100
         self.learning_rate = 0.0001
         self.output_stride = 8
+        
+        self.created_at = datetime.utcnow()
         
         self.training_loss = 0.0
         self.training_accuracy = 0.0
@@ -70,6 +75,8 @@ class ImagenetClassification(db.Model):
     batch_size = db.Column(db.Integer, nullable=False)
     learning_rate = db.Column(db.Float, nullable=False)
     
+    created_at = db.Column(db.DateTime, nullable=False)
+    
     graphs = db.Column(db.PickleType())
     
     training_loss = db.Column(db.Float, nullable=False)
@@ -86,7 +93,7 @@ class ImagenetClassification(db.Model):
     
     exclude_from_form = ['graphs',
                          'training_loss','training_accuracy',
-                         'validation_loss', 'validation_accuracy']
+                         'validation_loss', 'validation_accuracy', 'created_at']
     
     def __init__(self, *args, **kwargs):
         
@@ -95,6 +102,8 @@ class ImagenetClassification(db.Model):
         self.gpu_id = 0
         self.batch_size = 100
         self.learning_rate = 0.0001
+        
+        self.created_at = datetime.utcnow()
         
         self.training_loss = 0.0
         self.training_accuracy = 0.0
