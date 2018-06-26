@@ -25,8 +25,10 @@ server = Flask(__name__)
 # it's the first time the app is run
 
 database_file_location = "~/.dash-deep/experiments.db"
+models_save_folder_path = "~/.dash-deep/models"
 
 database_file_location = os.path.expanduser( database_file_location )
+models_save_folder_path = os.path.expanduser( models_save_folder_path )
 
 database_path = os.path.dirname(database_file_location)
 

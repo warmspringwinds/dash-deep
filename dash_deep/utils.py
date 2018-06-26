@@ -5,7 +5,6 @@ from dash_deep.widjets.widjets_factory import generate_widjet_from_form
 from dash_deep.cli.cli_factory import generate_click_cli
 
 
-
 def generate_model_save_file_path(experiment_sql_model_instance):
     """Generates a save path of experiment model relative to the folder
     where all the models are being saved (usually relative to ~/.dash-deep/models.
