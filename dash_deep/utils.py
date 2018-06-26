@@ -1,7 +1,53 @@
+import os
 from wtforms import Form
 from wtforms.ext.sqlalchemy.orm import model_form
 from dash_deep.widjets.widjets_factory import generate_widjet_from_form
 from dash_deep.cli.cli_factory import generate_click_cli
+
+
+
+def generate_model_save_file_path(experiment_sql_model_instance):
+    """Generates a save path of experiment model relative to the folder
+    where all the models are being saved (usually relative to ~/.dash-deep/models.
+    
+    The function assumes that the field `created_at` is present in the model
+    and is initialized. The model save path is composed following the rule:
+    experiment_title/year/month/day/experiment_title-daytime.pth. By prepending
+    `~/.dash-deep/models/` to the returned string, you will get the full path
+    to the saved model file.
+    
+    Parameters
+    ----------
+    experiment_sql_model_instance : instance of sqlalchemy model class
+        Sql alchemy model class instance
+    
+    Returns
+    -------
+    full_path : string
+        String representing the model save path.
+        
+    """
+    
+    date = experiment_sql_model_instance.created_at.date()
+    time = experiment_sql_model_instance.created_at.time()
+    
+    # Converting title to a name with spaces replaced with dashes
+    experiment_type_folder_name = experiment_sql_model_instance.title.lower().replace(' ', '-')
+
+    date_folder_path = os.path.join(str(date.year),
+                                    str(date.month),
+                                    str(date.day))
+    
+    # Replace everything in the time with dashes
+    day_time_string = str(time).replace(':', '-').replace('.', '-')
+
+    filename = experiment_type_folder_name + '-' + day_time_string + '.pth'
+    
+    full_path = os.path.join(experiment_type_folder_name,
+                             date_folder_path,
+                             filename)
+    
+    return full_path
 
 
 def generate_wtform_instances_and_input_form_widjets(scripts_db_models):
