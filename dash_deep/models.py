@@ -18,6 +18,8 @@ class EndovisBinary(db.Model):
     
     created_at = db.Column(db.DateTime, nullable=False)
     
+    model_path = db.Column(db.String(120), nullable=False)
+    
     graphs = db.Column(db.PickleType())
     
     training_loss = db.Column(db.Float, nullable=False)
@@ -35,7 +37,7 @@ class EndovisBinary(db.Model):
     exclude_from_form = ['graphs',
                          'training_loss',
                          'training_accuracy', 'validation_accuracy',
-                         'created_at']
+                         'created_at', 'model_path']
     
     def __init__(self, *args, **kwargs):
         
@@ -47,6 +49,7 @@ class EndovisBinary(db.Model):
         self.output_stride = 8
         
         self.created_at = datetime.utcnow()
+        self.model_path = ''
         
         self.training_loss = 0.0
         self.training_accuracy = 0.0
@@ -77,6 +80,8 @@ class ImagenetClassification(db.Model):
     
     created_at = db.Column(db.DateTime, nullable=False)
     
+    model_path = db.Column(db.String(120), nullable=False)
+    
     graphs = db.Column(db.PickleType())
     
     training_loss = db.Column(db.Float, nullable=False)
@@ -93,7 +98,8 @@ class ImagenetClassification(db.Model):
     
     exclude_from_form = ['graphs',
                          'training_loss','training_accuracy',
-                         'validation_loss', 'validation_accuracy', 'created_at']
+                         'validation_loss', 'validation_accuracy',
+                         'created_at', 'model_path']
     
     def __init__(self, *args, **kwargs):
         
@@ -103,7 +109,8 @@ class ImagenetClassification(db.Model):
         self.batch_size = 100
         self.learning_rate = 0.0001
         
-        self.created_at = datetime.utcnow()
+        self.created_at = datetime.utcnow
+        self.model_path = ''
         
         self.training_loss = 0.0
         self.training_accuracy = 0.0
