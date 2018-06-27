@@ -50,6 +50,11 @@ server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Database object 
 db = SQLAlchemy(server)
 
+app = dash.Dash(__name__, server=server)
+
+from dash_deep.task import TaskManager
+
+task_manager = TaskManager()
 
 # In order for all our database models representing the scripts
 # to be available in db object, we need to import dash_deep.models
@@ -69,11 +74,8 @@ import dash_deep.cli.default_commands
 
 # Initializing the Dash application
 
-app = dash.Dash(__name__, server=server)
 
-from dash_deep.task import TaskManager
 
-task_manager = TaskManager()
 
 
 # Since we're adding callbacks to elements that don't exist in the app.layout,
