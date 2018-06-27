@@ -1,5 +1,10 @@
 from dash_deep.app import db
+from dash_deep.app import models_save_folder_path
+from dash_deep.utils import generate_model_save_file_path
+
+import os
 from sqlalchemy.orm.attributes import flag_modified
+
 
 
 class Experiment():
@@ -34,7 +39,15 @@ class Experiment():
         # Attaching the detached instance of sql model class to our session
         # Each process usually has its own session and we attach this object to it.
         self.sql_model_instance = self.db.session.merge(sql_model_instance)
-    
+        
+        # Generating unique model save path for current experiment
+        self.relative_model_file_save_path = generate_model_save_file_path(sql_model_instance)
+        
+        self.absolute_model_file_save_path = os.path.join(models_save_folder_path,
+                                                          self.relative_model_file_save_path)
+        
+        self.best_model_file_saved_at_least_once = False
+        
     
     def start(self):
         """Starts the experiment.
@@ -94,6 +107,35 @@ class Experiment():
         self.db.session.add(self.sql_model_instance)
         self.db.session.commit()
     
+    
+    def get_best_model_file_save_path(self):
+        
+        if self.best_model_file_saved_at_least_once:
+            
+            return self.absolute_model_file_save_path
+        
+        # create the base name path if not exists
+        
+        absolute_dirname = os.path.dirname(self.absolute_model_file_save_path)
+
+        if not os.path.exists(absolute_dirname):
+
+            os.makedirs(absolute_dirname)
+        
+        # update the model with respective path
+        
+        self.sql_model_instance.model_path = self.relative_model_file_save_path
+        
+        self.db.session.add(self.sql_model_instance)
+        self.db.session.commit()
+        
+        # change the variable state to True
+        
+        self.best_model_file_saved_at_least_once = True
+        
+        return self.absolute_model_file_save_path
+        
+
     def finish(self):
         
         # TODO: add additional field to the models -- finished
