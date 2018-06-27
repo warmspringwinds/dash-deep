@@ -337,7 +337,9 @@ def run(sql_db_model):
 
         # Save the model if it has a better MIoU score.
         if current_validation_score > best_validation_score:
-
+            
+            model_save_path = experiment.get_best_model_file_save_path()
+            torch.save(fcn.state_dict(), model_save_path)
             #torch.save(fcn.state_dict(), 'resnet_18_8s_best.pth')
             best_validation_score = current_validation_score
             experiment.update_best_iteration_results(validation_accuracy=current_validation_score)

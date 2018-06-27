@@ -109,6 +109,21 @@ class Experiment():
     
     
     def get_best_model_file_save_path(self):
+        """Returns the path to save the best performing model currently discovered.
+        
+        The function generates unique name for current experiment to save its model
+        file. It is assumed that in the script file the user saves the model
+        file to the specified path right after calling this function. The path
+        to the model is being commited to the database also. If the function
+        was not called during the execution of the user's script, it is assumed
+        that model was not saved and the experiment database record will have a blank
+        model file field.
+    
+        Returns
+        ----------
+        absolute_model_file_save_path : Absolute path to save the model
+            Absolute path where the user should save the model.
+        """
         
         if self.best_model_file_saved_at_least_once:
             
