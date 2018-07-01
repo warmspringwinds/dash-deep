@@ -4,6 +4,44 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from dash_deep.widjets.widjets_factory import generate_widjet_from_form
 from dash_deep.cli.cli_factory import generate_click_cli
 
+import re
+import base64
+import numpy as np
+from PIL import Image
+from io import BytesIO
+
+
+def convert_base64_image_string_to_numpy(base64_image_string):
+    """Converts an image string in the base64 encoding into a numpy
+    array.
+    
+    Dash's Upload element returns uploaded images as a base64 encoded string
+    with prepended metadata info. In this function we remove this metadata and
+    convert the leftover string into numpy image.
+    
+    Parameters
+    ----------
+    base64_image_string : string
+        Base64 encoded image string.
+    
+    Returns
+    -------
+    img_np : numpy ndarray
+        Ndarray representation of an image.
+        
+    """
+    
+    
+    # Removing the metadata flag, read more here:
+    # https://stackoverflow.com/a/26085215
+    base64_image_string_without_metadata = re.sub('^data:image/.+;base64,', '', base64_image_string)
+            
+    # Deconding the 
+    img_np = np.asarray( Image.open(BytesIO(base64.b64decode(base64_image_string_without_metadata))) )
+    
+    return img_np
+    
+    
 
 def generate_model_save_file_path(experiment_sql_model_instance):
     """Generates a save path of experiment model relative to the folder
