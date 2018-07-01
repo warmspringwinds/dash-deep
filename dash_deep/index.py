@@ -9,6 +9,7 @@ from dash_deep.widjets import gpu_utilization_monitor
 #from dash_deep.widjets import training_jobs_monitor
 from dash_deep.widjets import widjets_factory
 from dash_deep.widjets import tasks_manager
+from dash_deep.widjets import inference
 
 from dash_deep.utils import get_script_titles_url_endpoints_and_cli_names
 from dash_deep.utils import generate_wtform_instances_and_input_form_widjets, generate_scripts_input_form_cli_interfaces
@@ -60,7 +61,9 @@ index_page = html.Div([
     html.Br(),
     dcc.Link('Endovis Binary History', href='/history'),
     html.Br(),
-    dcc.Link('Imagenet History', href='/imagenet')
+    dcc.Link('Imagenet History', href='/imagenet'),
+    html.Br(),
+    dcc.Link('Inference', href='/inference')
 ])
 
 
@@ -108,6 +111,10 @@ def display_page(pathname):
     elif pathname == '/imagenet':
         
         return imagenet_history_layout
+    
+    elif pathname == '/inference':
+        
+        return inference.layout
     
     else:
         
