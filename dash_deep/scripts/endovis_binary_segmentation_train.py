@@ -304,8 +304,10 @@ def run(sql_db_model):
 
             optimizer.step()
 
-            # print statistics
-            running_loss += (loss.data[0] / logits_flatten_valid.size(0)) 
+            # Be very carefull about the things that you append to the results
+            # array, once we accidently put a gpu tensor there which got pickeled
+            # and unpickled later on, taking the gpu memory and causing unobvious problems
+            running_loss += (loss.data[0].cpu().clone().numpy() / logits_flatten_valid.size(0)) 
             if i % 2 == 1:
                 
                 loss_history.append(running_loss / 2)
