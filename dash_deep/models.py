@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 from dash_deep.scripts.endovis_binary_segmentation_train import run as endovis_binary_segmentation_train_run
+from dash_deep.scripts.endovis_binary_segmentation_train import inference as endovis_binary_segmentation_inference
 
 
 class EndovisBinary(db.Model):
@@ -32,7 +33,8 @@ class EndovisBinary(db.Model):
                            [ ('Accuracy', ['training_accuracy', 'validation_accuracy']) ]
                        ]
     
-    actions = {'main': endovis_binary_segmentation_train_run}
+    actions = {'main': endovis_binary_segmentation_train_run,
+               'inference': endovis_binary_segmentation_inference}
     
     exclude_from_form = ['graphs',
                          'training_loss',
