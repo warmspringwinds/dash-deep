@@ -11,6 +11,35 @@ from PIL import Image
 from io import BytesIO
 
 
+def convert_numpy_to_base64_image_string(image_np):
+    """Converts a numpy image representation to a base64 encoding
+    of the image file with a metadata that is necessary to display it in 
+    
+    Dash's image object can display images encoded in base64 format if
+    they have necessary metadata flags which we also add.
+    
+    Parameters
+    ----------
+    image_np : numpy ndarray (dtype=np.uint8)
+        numpy ndarray (dtype=np.uint8)
+    
+    Returns
+    -------
+    base64_img_string_with_metadata : string
+        string
+    """
+    
+    image_pil = Image.fromarray(image_np)
+    
+    buffer = BytesIO()
+    image_pil.save(buffer, format="JPEG")
+    base64_img_string = base64.b64encode(buffer.getvalue())
+    
+    base64_img_string_with_metadata = "data:image/jpg;base64,{}".format(base64_img_string)
+    
+    return base64_img_string_with_metadata
+
+
 def convert_base64_image_string_to_numpy(base64_image_string):
     """Converts an image string in the base64 encoding into a numpy
     array.
