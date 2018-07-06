@@ -1,3 +1,4 @@
+from dash_deep.app import models_save_folder_path
 from dash_deep.logging import Experiment
 from time import sleep
 
@@ -351,3 +352,23 @@ def run(sql_db_model):
     print('Best validation score is: ' + str(best_validation_score))
     
     return 'success'
+
+
+def inference(sql_db_model, input_image_np):
+    
+    relative_model_path = sql_db_model.model_path
+    full_model_path = os.path.join(models_save_folder_path, relative_model_path)
+    
+    img = torch.from_numpy(input_image_np).cuda()
+    
+    fcn = resnet_dilated.Resnet18_8s(num_classes=2)
+    
+    fcn.load_state_dict(torch.load(full_model_path))
+    fcn.cuda()
+    fcn.eval()
+    
+    res = fcn(img)
+    
+    res_np = res.cpu().detach().numpy().copy()
+    
+    return res_np
