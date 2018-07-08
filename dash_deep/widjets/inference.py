@@ -2,11 +2,11 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State, Event
 
-from dash_deep.app import app, scripts_db_models
+from dash_deep.app import app, scripts_db_models, db, task_manager
 
 import dash_table_experiments as dt
 from dash_deep.sql import generate_table_contents_from_sql_model_class
-from dash_deep.utils import convert_base64_image_string_to_numpy
+from dash_deep.utils import convert_base64_image_string_to_numpy, convert_numpy_to_base64_image_string
 
 
 #script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
@@ -19,6 +19,8 @@ data_table_id = 'inference-datatable' #script_type_name_id + '-datatable'
 #initial_table_contents = generate_table_contents_from_sql_model_class(script_sql_class)
 
 script_sql_class = scripts_db_models[0]
+
+print(script_sql_class.actions['inference'])
 
 layout = html.Div([
 
@@ -62,8 +64,26 @@ def callback(n_clicks):
 
 
 @app.callback(Output('inference-output', 'children'),
-              [Input('inference-upload', 'contents')])
-def update_output(contents):
+              [Input('inference-upload', 'contents'),
+               Input(data_table_id, 'rows'),
+               Input(data_table_id, 'selected_row_indices')])
+def update_output(contents, rows, selected_row_indices):
+    
+    print('submitted')
+    
+    selected_experiments = map(lambda selected_row_index: rows[selected_row_index], selected_row_indices)
+    
+    selected_experiment_ids = tuple(map(lambda experiment: experiment['id'], selected_experiments))
+    
+    print(selected_experiment_ids)
+
+    extracted_rows = script_sql_class.query.filter(script_sql_class.id.in_(selected_experiment_ids)).all()
+    
+    print(extracted_rows)
+    # expunge all the models instances (done)
+    map(db.session.expunge, extracted_rows)
+    
+    row = extracted_rows[0]
     
     if contents is not None:
         content_type, content_string = contents.split(',')
@@ -71,11 +91,16 @@ def update_output(contents):
         if 'image' in content_type:
             
             img_np = convert_base64_image_string_to_numpy(contents)
-                        
-            print(img_np.shape)
+            
+            future_obj = task_manager.process_pool.schedule( script_sql_class.actions['inference'],
+                                                 args=(row, img_np) )
+            
+            result_np = future_obj.result()
+            
+            results_base64 = convert_numpy_to_base64_image_string(result_np)
             
             return html.Div([
-                html.Img(src=contents)
+                html.Img(src=results_base64)
             ])
 
 # @app.callback(

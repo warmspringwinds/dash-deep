@@ -359,7 +359,20 @@ def inference(sql_db_model, input_image_np):
     relative_model_path = sql_db_model.model_path
     full_model_path = os.path.join(models_save_folder_path, relative_model_path)
     
-    img = torch.from_numpy(input_image_np).cuda()
+    valid_transform = transforms.Compose(
+                [
+                     transforms.Lambda(lambda x: Image.fromarray(x)),
+                     transforms.CenterCrop((1024, 1280)),
+                     transforms.ToTensor(),
+                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+                ])
+    
+    
+    img = valid_transform(input_image_np)
+
+    img = img.unsqueeze(0)
+        
+    img = img.cuda()
     
     fcn = resnet_dilated.Resnet18_8s(num_classes=2)
     
@@ -369,6 +382,11 @@ def inference(sql_db_model, input_image_np):
     
     res = fcn(img)
     
-    res_np = res.cpu().detach().numpy().copy()
+    # (h, w)
+    _, res = res.squeeze(0).max(0)
+    
+    res_np = res.cpu().detach().numpy().copy().astype(np.uint8) * 100
+    
+    #res_np = res_np.squeeze().transpose(1, 2, 0)
     
     return res_np
