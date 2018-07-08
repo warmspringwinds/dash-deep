@@ -385,8 +385,7 @@ def inference(sql_db_model, input_image_np):
     # (h, w)
     _, res = res.squeeze(0).max(0)
     
+    # Temporarly multiplying by 100 for contrast
     res_np = res.cpu().detach().numpy().copy().astype(np.uint8) * 100
-    
-    #res_np = res_np.squeeze().transpose(1, 2, 0)
     
     return res_np

@@ -86,22 +86,27 @@ def update_output(contents, rows, selected_row_indices):
     row = extracted_rows[0]
     
     if contents is not None:
+        
         content_type, content_string = contents.split(',')
         
         if 'image' in content_type:
             
-            img_np = convert_base64_image_string_to_numpy(contents)
+            output_images = [html.Img(src=contents)]
             
-            future_obj = task_manager.process_pool.schedule( script_sql_class.actions['inference'],
-                                                 args=(row, img_np) )
+            for row in extracted_rows:
             
-            result_np = future_obj.result()
+                img_np = convert_base64_image_string_to_numpy(content_string)
+
+                future_obj = task_manager.process_pool.schedule( script_sql_class.actions['inference'],
+                                                                 args=(row, img_np) )
+
+                result_np = future_obj.result()
+
+                results_base64 = convert_numpy_to_base64_image_string(result_np)
+                
+                output_images.append( html.Img(src=results_base64) )
             
-            results_base64 = convert_numpy_to_base64_image_string(result_np)
-            
-            return html.Div([
-                html.Img(src=results_base64)
-            ])
+            return html.Div(output_images)
 
 # @app.callback(
 # Output(graph_id_name, 'figure'),
