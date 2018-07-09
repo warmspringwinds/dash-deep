@@ -107,35 +107,3 @@ def update_output(contents, rows, selected_row_indices):
                 output_images.append( html.Img(src=results_base64) )
             
             return html.Div(output_images)
-
-# @app.callback(
-# Output(graph_id_name, 'figure'),
-# [Input(data_table_id, 'rows'),
-#  Input(data_table_id, 'selected_row_indices'),
-#  Input(interval_object_name_id, 'n_intervals')])
-# def callback(rows, selected_row_indices, n_intervals):
-
-#     print(rows)
-#     print(selected_row_indices)
-
-#     if not selected_row_indices:
-
-#         return {'data':[], 'layout':[]}
-
-#     selected_experiments = map(lambda selected_row_index: rows[selected_row_index], selected_row_indices)
-
-#     selected_experiment_ids = tuple(map(lambda experiment: experiment['id'], selected_experiments))
-
-#     extracted_rows = script_sql_class.query.filter(script_sql_class.id.in_(selected_experiment_ids)).all()
-
-#     mutual_plot = create_mutual_plot(extracted_rows)
-
-#     return mutual_plot
-
-
-# @app.callback(
-# Output(interval_object_name_id, 'interval'),
-# [Input(radio_button_id, 'value')])
-# def update_interval(value):
-
-#     return value
