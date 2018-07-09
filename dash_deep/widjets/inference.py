@@ -47,7 +47,8 @@ layout = html.Div([
             'borderRadius': '5px',
             'textAlign': 'center',
             'margin': '10px'
-        }
+        },
+       multiple=True
     ),
     html.Div(id='inference-output')
 ])
@@ -67,9 +68,7 @@ def callback(n_clicks):
               [Input('inference-upload', 'contents'),
                Input(data_table_id, 'rows'),
                Input(data_table_id, 'selected_row_indices')])
-def update_output(contents, rows, selected_row_indices):
-    
-    print('submitted')
+def update_output(list_of_contents, rows, selected_row_indices):
     
     selected_experiments = map(lambda selected_row_index: rows[selected_row_index], selected_row_indices)
     
@@ -83,27 +82,30 @@ def update_output(contents, rows, selected_row_indices):
     # expunge all the models instances (done)
     map(db.session.expunge, extracted_rows)
     
-    row = extracted_rows[0]
+    output_images = []
     
-    if contents is not None:
-        
-        content_type, content_string = contents.split(',')
-        
-        if 'image' in content_type:
-            
-            output_images = [html.Img(src=contents)]
-            
-            for row in extracted_rows:
-            
-                img_np = convert_base64_image_string_to_numpy(content_string)
+    for contents in list_of_contents:
+    
+        if contents is not None:
 
-                future_obj = task_manager.process_pool.schedule( script_sql_class.actions['inference'],
-                                                                 args=(row, img_np) )
+            content_type, content_string = contents.split(',')
 
-                result_np = future_obj.result()
+            if 'image' in content_type:
 
-                results_base64 = convert_numpy_to_base64_image_string(result_np)
-                
-                output_images.append( html.Img(src=results_base64) )
+                output_images.append(html.Img(src=contents))
+
+                for row in extracted_rows:
+
+                    img_np = convert_base64_image_string_to_numpy(content_string)
+
+                    future_obj = task_manager.process_pool.schedule( script_sql_class.actions['inference'],
+                                                                     args=(row, img_np) )
+
+                    result_np = future_obj.result()
+
+                    results_base64 = convert_numpy_to_base64_image_string(result_np)
+
+                    output_images.append( html.Img(src=results_base64) )
+
             
-            return html.Div(output_images)
+    return output_images
