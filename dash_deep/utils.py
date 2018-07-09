@@ -1,8 +1,8 @@
 import os
 from wtforms import Form
 from wtforms.ext.sqlalchemy.orm import model_form
-from dash_deep.widjets.widjets_factory import generate_widjet_from_form
 from dash_deep.cli.cli_factory import generate_click_cli
+from dash_deep.widjets.widjets_factory import generate_widjet_from_form
 
 import re
 import base64

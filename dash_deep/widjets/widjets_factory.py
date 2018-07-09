@@ -11,6 +11,144 @@ import dash_table_experiments as dt
 from dash_deep.plot import create_mutual_plot
 from dash_deep.sql import generate_table_contents_from_sql_model_class
 
+# Temporary solution for the problem of circular imports
+import dash_deep.utils
+
+
+def generate_script_inference_widjet(script_sql_class):
+    """Generates an inference widjet given the sql alchemy class representing
+    experiment.
+    
+    Generates an inference widjet which allows to select trained models
+    and see the qualitative results of the performance of the model
+    on the uploaded by the user images
+    
+    Parameters
+    ----------
+    script_sql_class : sqlalchemy class
+        Sql alchemy class to extract all the records from.
+    
+    Returns
+    -------
+    layout : dash.html.Div
+        dash.html.Div object containing the widjet
+    """
+
+    script_type_name_id = script_sql_class.title.lower().replace(' ', '_')
+    button_id = script_type_name_id + '-inference-refresh-button'
+    data_table_id = script_type_name_id + '-inference-datatable'
+    upload_widjet_id = script_type_name_id + '-inference-upload'
+    output_div_id = script_type_name_id + '-inference-output-results'
+
+    layout = html.Div([
+
+            html.H1(script_sql_class.title),
+            dt.DataTable(
+                         rows=[{}],
+                         id=data_table_id,
+                         row_selectable=True,
+                         filterable=True,
+                         ),
+            html.Button('Refresh Table', id=button_id),
+            dcc.Upload(
+            id=upload_widjet_id,
+            children=html.Div([
+                'Drag and Drop or ',
+                html.A('Select a File')
+            ]),
+            style={
+                'width': '100%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px'
+            },
+           multiple=True
+        ),
+        html.Div(id=output_div_id)
+    ])
+
+
+    @app.callback(
+    Output(data_table_id, 'rows'),
+    [Input(button_id, 'n_clicks')])
+    def callback(n_clicks):
+
+        rows = generate_table_contents_from_sql_model_class(script_sql_class)
+
+        return rows
+
+
+    @app.callback(Output(output_div_id, 'children'),
+                  [Input(upload_widjet_id, 'contents'),
+                   Input(data_table_id, 'rows'),
+                   Input(data_table_id, 'selected_row_indices')])
+    def update_output(list_of_contents,
+                      rows,
+                      selected_row_indices):
+
+        output = []
+
+        if not list_of_contents:
+
+            return output
+
+        if not selected_row_indices:
+
+            return output
+
+        # TODO:
+        # Generate page for each experiment type 
+        # Make the display of the results more vivid (distinctive colors)
+        # Correctly add additional inputs like filename and date of last update like here:
+        # https://dash.plot.ly/dash-core-components/upload
+        # When we tried last time it cause the function to be called multiple times instead of
+        # just one
+
+        selected_experiments = map(lambda selected_row_index: rows[selected_row_index], selected_row_indices)
+
+        selected_experiment_ids = tuple(map(lambda experiment: experiment['id'], selected_experiments))
+
+        extracted_rows = script_sql_class.query.filter(script_sql_class.id.in_(selected_experiment_ids)).all()
+
+        # expunge all the models instances (done)
+        map(db.session.expunge, extracted_rows)
+        
+        
+        for contents in list_of_contents:
+
+            if contents is not None:
+                
+                content_type, content_string = contents.split(',')
+
+                if 'image' in content_type:
+                    
+                    output.append(html.Img(src=contents))
+
+                    for row in extracted_rows:
+
+                        img_np = dash_deep.utils.convert_base64_image_string_to_numpy(content_string)
+
+                        future_obj = task_manager.process_pool.schedule( script_sql_class.actions['inference'],
+                                                                         args=(row, img_np) )
+
+                        result_np = future_obj.result()
+
+                        results_base64 = dash_deep.utils.convert_numpy_to_base64_image_string(result_np)
+
+
+                        output.append( html.H1( "Result of model id#{}".format(row.id) ) )
+                        output.append( html.Img(src=results_base64) )
+
+
+        return output
+    
+    
+    return layout
+
 
 def generate_widjet_from_form(form):
     """Generates an input form dash widjet given the wtf form object.
