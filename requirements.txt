@@ -1,7 +1,8 @@
 dash==0.21.0  # The core dash backend
 dash-renderer==0.12.1  # The dash front-end
 dash-html-components==0.10.0  # HTML components
-dash-core-components==0.22.1  # Supercharged components
+dash_core_components==0.24.0rc2
+#dash-core-components==0.22.1  # Supercharged components
 dash-table-experiments # Dash's data table support
 plotly # Plotting library for real-time interactive loss/accuracy tracking
 pebble # Alternative process management for python. Reasons why we use it: https://stackoverflow.com/questions/42782953/python-concurrent-futures-how-to-make-it-cancelable/45565421#45565421

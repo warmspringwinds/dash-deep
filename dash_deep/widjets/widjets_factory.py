@@ -16,6 +16,52 @@ from dash_deep.sql import generate_table_contents_from_sql_model_class
 import dash_deep.utils
 
 
+
+def generate_script_navigation_page(title_and_url_endpoint_pairs_list, title):
+    """Generates a navigation menu with specified titles and corresponding
+    links.
+    
+    Generates a simple navigation widjet which is created as a table
+    containing button objects.
+    
+    Parameters
+    ----------
+    title_and_url_endpoint_pairs_list : list of string pairs
+        Pairs of title and url strings.
+        
+    title : string
+        Title of the table to create.
+    
+    Returns
+    -------
+    navigation_page : dash.html.Div
+        dash.html.Div object containing the navigation widjet
+    """
+    
+    navigation_page_contents = []
+    
+    navigation_page_contents.append( html.H1(title) )
+    
+    links_table_contents = []
+    
+    for title, full_url_endpoint in title_and_url_endpoint_pairs_list:
+        
+        
+        table_row_element = html.Tr([html.Td(dcc.Link(html.Button(title, style={'width':'100%'}),
+                                                      href=full_url_endpoint))])
+        
+        links_table_contents.append(table_row_element)
+    
+    
+    navigation_page_contents.append(html.Table(links_table_contents, style={'margin-left': 'auto', 
+                                                                            'margin-right': 'auto'}))
+    
+    navigation_page = html.Div(navigation_page_contents)
+    
+    return navigation_page
+    
+
+    
 def generate_script_inference_widjet(script_sql_class):
     """Generates an inference widjet given the sql alchemy class representing
     experiment.

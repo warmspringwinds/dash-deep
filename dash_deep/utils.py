@@ -1,10 +1,10 @@
-import os
 from dash_deep.cli.cli_factory import generate_script_input_form_cli_interface
 
 from dash_deep.widjets.widjets_factory import (generate_script_input_form_widjet,
                                                generate_script_plots_widjet,
-                                               generate_script_inference_widjet)
-
+                                               generate_script_inference_widjet,
+                                               generate_script_navigation_page)
+import os
 import re
 import base64
 import numpy as np
@@ -117,11 +117,14 @@ def generate_model_save_file_path(experiment_sql_model_instance):
     return full_path
 
 
-def get_script_titles_url_endpoints_and_cli_names(script_db_models):
-    """Generates titles and url endpoints for each script from its sqlalchemy model class.
+def generate_scripts_widjets_and_cli_interfaces(script_db_models):
+    """ Generates lookup table with url to widjet mapping and cli interfaces
+    for each script.
     
-    Converts sqlalchemy class for each script into title and url endpoint that will be used
-    on the front page of all scripts.
+    Returns the index page widjet which contains links to other script
+    control pages where user can start, track plots and perform inference
+    using trained models. Also returns the cli interface which can be used
+    to start new experiment through command line interface.
     
     Parameters
     ----------
@@ -130,42 +133,61 @@ def get_script_titles_url_endpoints_and_cli_names(script_db_models):
     
     Returns
     -------
-    script_titles : list of strings
-        List of strings representing titles for each script.
-        
-    script_full_url_endpoints : list of strings
-        List of strings representing url endpoints.
     
-    script_cli_names : list of strings
-        List of strings representing comman line names of commands.
+    index_page : dash widjet
+        Dash widjet containing main page navigation menu
+        
+    scripts_full_url_widjet_look_up_table : dict
+        Dict that maps full urls into Dash widjet
+    
+    scripts_name_and_cli_instance_pairs : list of tuples
+        List with string cli_interface pairs where string
+        represents the cli interface name
         
     """
     
-    script_titles = []
-    script_cli_names = []
-    script_full_url_endpoints = []
+    scripts_full_url_widjet_look_up_table = {}
+    scripts_name_and_cli_instance_pairs = []
+    
+    index_page_nav_bar_content = [('GPU utilization', '/gpu'),
+                                  ('Tasks tracking', '/tasks')]
     
     for script_db_model in script_db_models:
         
         script_title = script_db_model.title
-        script_titles.append(script_title)
+        script_name = script_title.lower().replace(' ', '_')
+        script_cli_instance = generate_script_input_form_cli_interface(script_db_model)
+        scripts_name_and_cli_instance_pairs.append( (script_name, script_cli_instance) )
         
-        script_url_endpoint = script_title.lower().replace(' ', '_')
-        script_cli_names.append(script_url_endpoint)
+        script_main_page_url = "/{}".format(script_name)
+        script_train_page_url = "/{}/train".format( script_name )
+        script_plot_page_url = "/{}/plot".format( script_name )
+        script_inference_page_url = "/{}/inference".format( script_name )
         
-        current_script_endpoints = {}
+        index_page_nav_bar_content.append((script_title, script_main_page_url))
         
+        script_main_page_nav_bar_content = [('GPU utilization', '/gpu'),
+                                            ('Tasks tracking', '/tasks'),
+                                            ('Train', script_train_page_url),
+                                            ('Plot', script_plot_page_url),
+                                            ('Inference', script_inference_page_url)]
+        
+        script_main_page_widjet = generate_script_navigation_page(script_main_page_nav_bar_content,
+                                                                  script_title)
+ 
+        scripts_full_url_widjet_look_up_table[script_main_page_url] = script_main_page_widjet
+       
         new_script_input_form_widjet = generate_script_input_form_widjet(script_db_model)
-        current_script_endpoints['train'] = ("/{}/train".format( script_url_endpoint ), new_script_input_form_widjet)
+        scripts_full_url_widjet_look_up_table[script_train_page_url] = new_script_input_form_widjet 
         
         inference_widjet = generate_script_inference_widjet(script_db_model)
-        current_script_endpoints['inference'] = ("/{}/inference".format( script_url_endpoint ), inference_widjet)
+        scripts_full_url_widjet_look_up_table[script_inference_page_url] = inference_widjet
         
         plots_widjet = generate_script_plots_widjet(script_db_model)
-        current_script_endpoints['plot'] = ("/{}/plot".format( script_url_endpoint ), plots_widjet)
-        
-        script_full_url_endpoints.append(current_script_endpoints)
+        scripts_full_url_widjet_look_up_table[script_plot_page_url] = plots_widjet
+    
+    index_page = generate_script_navigation_page(index_page_nav_bar_content, 'Main')
         
     
-    return script_titles, script_full_url_endpoints, script_cli_names
+    return index_page, scripts_full_url_widjet_look_up_table, scripts_name_and_cli_instance_pairs
     

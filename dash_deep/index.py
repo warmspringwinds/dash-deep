@@ -4,47 +4,21 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
-
-from dash_deep.widjets import gpu_utilization_monitor
-from dash_deep.widjets import widjets_factory
-from dash_deep.widjets import tasks_manager
-from dash_deep.widjets import inference
-
-from dash_deep.utils import get_script_titles_url_endpoints_and_cli_names
-from dash_deep.utils import generate_wtform_instances_and_input_form_widjets, generate_scripts_input_form_cli_interfaces
-
 from dash_table_experiments import DataTable
 
+from dash_deep.widjets import gpu_utilization_monitor
+from dash_deep.widjets import tasks_manager
 
-script_files_title_names, script_files_url_endpoints, cli_names = get_script_titles_url_endpoints_and_cli_names(scripts_db_models)
-
-
-main_page_scripts_widjet_layout = widjets_factory.generate_main_page_scripts_widjet(script_files_title_names, script_files_url_endpoints)
-
-
-# TODO: + urls or it already exists?
-# wtform_classes, scripts_input_form_widjets = generate_wtform_instances_and_input_form_widjets(scripts_db_models)
+from dash_deep.utils import generate_scripts_widjets_and_cli_interfaces
 
 
-# Move the generation of 
-scripts_input_form_cli_interfaces = generate_scripts_input_form_cli_interfaces(wtform_classes)
-
-# TODO: create one function to create these results pages + respective urls?
-
-# endovis_history_layout = widjets_factory.generate_script_plots_widjet(scripts_db_models[0])
-
-# imagenet_history_layout = widjets_factory.generate_script_plots_widjet(scripts_db_models[1])
+index_page, scripts_full_url_widjet_look_up_table, scripts_name_and_cli_instance_pairs = generate_scripts_widjets_and_cli_interfaces(scripts_db_models)
 
 
-# TODO: factor out into a separate function?
-# Names are not defined so we get an empty strings in our command line
-# we should somehow push names there.
-
-for script_number, scripts_input_form_cli_interface in enumerate(scripts_input_form_cli_interfaces):
+for script_cli_name, script_cli_interface in scripts_name_and_cli_instance_pairs:
     
-    server.cli.add_command( scripts_input_form_cli_interface,
-                           name=cli_names[script_number] )
-    
+    server.cli.add_command(script_cli_interface, name=script_cli_name)
+
     
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -54,33 +28,6 @@ app.layout = html.Div([
     html.Div(DataTable(rows=[{}]), style={'display': 'none'})
 ], className='container', style={'text-align': 'center'})
 
-
-
-
-index_page = html.Div([
-    
-    html.H1('Main Menu'),
-    html.Table([
-                html.Tr([html.Td(dcc.Link(html.Button('GPU utilization', style={'width':'100%'}), href='/gpu'))]),
-                html.Tr([html.Td(dcc.Link(html.Button('Tasks tracking', style={'width':'100%'}), href='/tasks'))]),
-                html.Tr([html.Td(dcc.Link(html.Button('Training script parsing', style={'width':'100%'}), href='/scripts'))]),
-                html.Tr([html.Td(dcc.Link(html.Button('Endovis Binary History', style={'width':'100%'}), href='/history'))]),
-                html.Tr([html.Td(dcc.Link(html.Button('Imagenet History', style={'width':'100%'}), href='/imagenet'))]),
-                html.Tr([html.Td(dcc.Link(html.Button('Inference', style={'width':'100%'}), href='/inference'))])
-               ], style={'margin-left': 'auto', 
-                         'margin-right': 'auto'})
-])
-
-
-
-@app.callback(
-    Output('output', 'children'),
-    [Input('button-2', 'n_clicks')],
-    state=[State('input-1', 'value')])
-def compute(n_clicks, input1):
-    return 'A file to parse {}'.format(
-        input1
-    )
 
 
 # Update the index
@@ -97,28 +44,12 @@ def display_page(pathname):
     
     elif pathname == '/tasks':
         
-        #return training_jobs_monitor.layout
         return tasks_manager.layout
     
-    elif pathname == '/scripts':
-        
-        return main_page_scripts_widjet_layout
     
-    elif pathname in script_files_url_endpoints:
+    elif pathname in scripts_full_url_widjet_look_up_table:
         
-        return scripts_input_form_widjets[ script_files_url_endpoints.index(pathname) ]
-    
-    elif pathname == '/history':
-        
-        return endovis_history_layout
-    
-    elif pathname == '/imagenet':
-        
-        return imagenet_history_layout
-    
-    elif pathname == '/inference':
-        
-        return inference.layout
+        return scripts_full_url_widjet_look_up_table[ pathname ]
     
     else:
         
