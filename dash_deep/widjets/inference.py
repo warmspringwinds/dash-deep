@@ -8,4 +8,4 @@ from dash_deep.widjets.widjets_factory import generate_script_inference_widjet
 
 script_sql_class = scripts_db_models[0]
 
-layout = generate_script_inference_widjet(script_sql_class)
+#layout = generate_script_inference_widjet(script_sql_class)

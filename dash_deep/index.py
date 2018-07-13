@@ -6,7 +6,6 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
 from dash_deep.widjets import gpu_utilization_monitor
-#from dash_deep.widjets import training_jobs_monitor
 from dash_deep.widjets import widjets_factory
 from dash_deep.widjets import tasks_manager
 from dash_deep.widjets import inference
@@ -17,19 +16,24 @@ from dash_deep.utils import generate_wtform_instances_and_input_form_widjets, ge
 from dash_table_experiments import DataTable
 
 
-
 script_files_title_names, script_files_url_endpoints, cli_names = get_script_titles_url_endpoints_and_cli_names(scripts_db_models)
+
 
 main_page_scripts_widjet_layout = widjets_factory.generate_main_page_scripts_widjet(script_files_title_names, script_files_url_endpoints)
 
-wtform_classes, scripts_input_form_widjets = generate_wtform_instances_and_input_form_widjets(scripts_db_models)
 
+# TODO: + urls or it already exists?
+# wtform_classes, scripts_input_form_widjets = generate_wtform_instances_and_input_form_widjets(scripts_db_models)
+
+
+# Move the generation of 
 scripts_input_form_cli_interfaces = generate_scripts_input_form_cli_interfaces(wtform_classes)
 
-endovis_history_layout = widjets_factory.generate_script_results_widjet(scripts_db_models[0])
+# TODO: create one function to create these results pages + respective urls?
 
-imagenet_history_layout = widjets_factory.generate_script_results_widjet(scripts_db_models[1])
+# endovis_history_layout = widjets_factory.generate_script_plots_widjet(scripts_db_models[0])
 
+# imagenet_history_layout = widjets_factory.generate_script_plots_widjet(scripts_db_models[1])
 
 
 # TODO: factor out into a separate function?
@@ -44,28 +48,28 @@ for script_number, scripts_input_form_cli_interface in enumerate(scripts_input_f
     
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content'),
+    html.Div(id='page-content'),#, style={ 'border': '1px solid #d6d6d6', 'padding': '44px'}),
     
     # Fix for:https://community.plot.ly/t/data-tables-with-multi-pages/7282
     html.Div(DataTable(rows=[{}]), style={'display': 'none'})
 ], className='container', style={'text-align': 'center'})
 
 
-index_page = html.Div([
-    html.H1('Main Menu'),
-    dcc.Link('GPU utilization', href='/gpu'),
-    html.Br(),
-    dcc.Link('Tasks tracking', href='/tasks'),
-    html.Br(),
-    dcc.Link('Training script parsing', href='/scripts'),
-    html.Br(),
-    dcc.Link('Endovis Binary History', href='/history'),
-    html.Br(),
-    dcc.Link('Imagenet History', href='/imagenet'),
-    html.Br(),
-    dcc.Link('Inference', href='/inference')
-])
 
+
+index_page = html.Div([
+    
+    html.H1('Main Menu'),
+    html.Table([
+                html.Tr([html.Td(dcc.Link(html.Button('GPU utilization', style={'width':'100%'}), href='/gpu'))]),
+                html.Tr([html.Td(dcc.Link(html.Button('Tasks tracking', style={'width':'100%'}), href='/tasks'))]),
+                html.Tr([html.Td(dcc.Link(html.Button('Training script parsing', style={'width':'100%'}), href='/scripts'))]),
+                html.Tr([html.Td(dcc.Link(html.Button('Endovis Binary History', style={'width':'100%'}), href='/history'))]),
+                html.Tr([html.Td(dcc.Link(html.Button('Imagenet History', style={'width':'100%'}), href='/imagenet'))]),
+                html.Tr([html.Td(dcc.Link(html.Button('Inference', style={'width':'100%'}), href='/inference'))])
+               ], style={'margin-left': 'auto', 
+                         'margin-right': 'auto'})
+])
 
 
 

@@ -4,7 +4,8 @@ from dash.dependencies import Input, Output, State, Event
 
 from dash_deep.app import app, task_manager
 from dash_deep.sql import (get_column_names_and_values_from_sql_model_instance,
-                           get_column_names_from_sql_model_class)
+                           get_column_names_from_sql_model_class,
+                           generate_script_wtform_class_instance)
 
 from dash_deep.app import db
 import dash_table_experiments as dt
@@ -150,23 +151,23 @@ def generate_script_inference_widjet(script_sql_class):
     return layout
 
 
-def generate_widjet_from_form(form):
-    """Generates an input form dash widjet given the wtf form object.
+def generate_script_input_form_widjet(script_sql_class):
+    """Generates an input form dash widjet given the sql alchemy class representing
+    experiment.
     
-    Wtf form can be easily created from sqlalchemy model object. Later on,
-    the input fields can be also validated using wtf form.
     
     Parameters
     ----------
-    form : instance of wtforms.Form
-        Instance of wtform which can be created from sqlalchemy model
-        automatically wtforms.ext.sqlalchemy.orm.model_form() function.
+    script_sql_class : sqlalchemy class
+        Sql alchemy class to extract all the records from.
     
     Returns
     -------
     form_widjet : dash.html.Div
         dash.html.Div object containing the input fields
     """
+    
+    form = generate_script_wtform_class_instance(script_sql_class)
     
     # TODO: when the form is displayed the click event is started
     # for some reason.
@@ -279,7 +280,7 @@ def generate_main_page_scripts_widjet(script_files_title_names, script_files_url
 
 
 
-def generate_script_results_widjet(script_sql_class):
+def generate_script_plots_widjet(script_sql_class):
     """Generates a script's result page widjet where we can inspect all results.
     
     Extracts all the records of a specified sqlalchemy class and puts them

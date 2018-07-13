@@ -1,18 +1,17 @@
 import click
 from dash_deep.app import app
+from dash_deep.sql import generate_script_wtform_class_instance
 
 
-def generate_click_cli(wtform_instance):
-    """Generates a command-line interface from a wtform and a function that 
-    will be invoked with the input parameters of the form.
-    
-    Wtforms and click command line interface are used together to get user input,
-    validate it and populate sqalchemy instance later on.
+
+def generate_script_input_form_cli_interface(script_db_model):
+    """Generates a command-line interface from for sql_alchemy class
+    representing a script.
     
     Parameters
     ----------
-    wtform_instance : instance of wtform class
-        Wtform instace that was generated from sqlalchemy model
+    script_db_model : sqlalchemy classes
+        sqlalchemy class representing script.
         
     Returns
     -------
@@ -22,6 +21,8 @@ def generate_click_cli(wtform_instance):
             command()
          
     """
+    
+    wtform_instance = generate_script_wtform_class_instance(script_db_model)
     
     # TODO: since we have a form object we can create one more 
     # decorator to automatically validate the input to the function

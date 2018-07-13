@@ -5,6 +5,49 @@ from sqlalchemy.orm.attributes import flag_modified
 import dash_deep.models
 from dash_deep.app import db
 
+from wtforms import Form
+from wtforms.ext.sqlalchemy.orm import model_form
+
+
+
+def generate_script_wtform_class_instance(script_db_model):
+    """Generates wtforms.ext.sqlalchemy.orm class for script database class. 
+    
+    As most requirements to the input fields are specified in the classes of sql
+    models representing each script -- we can automatically create wtform classes
+    for each of them. This wtforms are later on used to generate input form widjets
+    for each script and to validate the user inputs + populate the sql model objects.
+    
+    Parameters
+    ----------
+    script_db_model : sqlalchemy class
+        sqlalchemy class representing script.
+    
+    Returns
+    -------
+    script_wtform_class_instance : wtforms.ext.sqlalchemy.orm class instance
+        Class representing wtform of sql model of a script.
+    """
+        
+    exclude_field_names = script_db_model.exclude_from_form
+
+    script_wtform_class = model_form(script_db_model, Form,
+                                     exclude=exclude_field_names)
+
+    script_wtform_class_instance = script_wtform_class()
+
+    # Copying the the actions field defined by the user in the model
+    # into the wtform instance. This action will be triggered
+    # once the form is validated
+    script_wtform_class_instance.actions = script_db_model.actions
+
+    # Also saving the class of the sql model so that
+    # we can create instance of it and fill out with the values
+    # of filled-out-by-the-user form.
+    script_wtform_class_instance.sql_model_class = script_db_model
+
+    return script_wtform_class_instance
+
 
 def generate_table_contents_from_sql_model_class(sql_model_class):
     """Extracts all records that are currently stored in the database
