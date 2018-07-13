@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 import dash
+import dash_auth
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
@@ -15,8 +16,6 @@ import pkgutil
 import importlib
 
 import click
-
-
 
 
 server = Flask(__name__)
@@ -51,6 +50,16 @@ server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(server)
 
 app = dash.Dash(__name__, server=server)
+
+# Keep this out of source code repository - save in a file or a database
+VALID_USERNAME_PASSWORD_PAIRS = [
+    ['hello', 'world']
+]
+
+auth = dash_auth.BasicAuth(
+                           app,
+                           VALID_USERNAME_PASSWORD_PAIRS
+)
 
 from dash_deep.task import TaskManager
 
