@@ -2,6 +2,12 @@ from dash_deep.app import db
 from dash_deep.plot import BaseGraph
 from datetime import datetime
 
+# More examples on flask-sqlalchemy mixins:
+# https://stackoverflow.com/questions/43386558/how-can-one-implement-mixin-in-flask
+
+# In case of multiple inheritance for mixins and the execution of constructor
+# functions of all the ancestor classes:
+# https://stackoverflow.com/questions/3277367/how-does-pythons-super-work-with-multiple-inheritance
 
 class BasicExperimentMixin(object):
     
@@ -22,7 +28,6 @@ class BasicExperimentMixin(object):
                            [ ('Losses', ['training_loss']) ],
                            [ ('Accuracy', ['training_accuracy', 'validation_accuracy']) ]
                        ]
-    
     
     exclude_from_form = ['graphs',
                          'training_loss',
