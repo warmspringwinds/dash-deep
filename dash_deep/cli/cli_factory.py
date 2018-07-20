@@ -1,7 +1,5 @@
 import click
-from dash_deep.app import app
 from dash_deep.sql import generate_script_wtform_class_instance
-
 
 
 def generate_script_input_form_cli_interface(script_db_model):
