@@ -389,3 +389,11 @@ def inference(sql_db_model, input_image_np):
     res_np = res.cpu().detach().numpy().copy().astype(np.uint8) * 100
     
     return res_np
+
+
+valset = Endovis_Instrument_2017(root='/home/daniil/.pytorch-segmentation-detection/datasets/endovis_2017',
+                                     dataset_type=0,
+                                     train=False)
+
+trainset = Endovis_Instrument_2017(root='/home/daniil/.pytorch-segmentation-detection/datasets/endovis_2017',
+                                       dataset_type=0)

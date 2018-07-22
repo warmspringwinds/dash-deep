@@ -4,7 +4,7 @@ from dash_deep.mixins import BasicExperimentMixin
 
 from dash_deep.scripts.endovis_binary_segmentation_train import run as endovis_binary_segmentation_train_run
 from dash_deep.scripts.endovis_binary_segmentation_train import inference as endovis_binary_segmentation_inference
-
+from dash_deep.scripts.endovis_binary_segmentation_train import valset, trainset
 
 class EndovisBinary(BasicExperimentMixin, db.Model):
     
@@ -14,6 +14,8 @@ class EndovisBinary(BasicExperimentMixin, db.Model):
     actions = {'main': endovis_binary_segmentation_train_run,
                'inference': endovis_binary_segmentation_inference}
     
+    datasets = {'train': trainset,
+                'valset': valset}
     
     
     def __init__(self, *args, **kwargs):

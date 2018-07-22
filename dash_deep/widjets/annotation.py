@@ -1,4 +1,4 @@
-from dash_deep.app import app
+from dash_deep.app import app, scripts_db_models
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -16,6 +16,11 @@ import matplotlib.patches as patches
 import numpy as np
 
 from dash_deep.utils import convert_numpy_to_base64_image_string, convert_base64_image_string_to_numpy
+
+
+sql_model = scripts_db_models[0]
+
+trainset = sql_model.datasets['train']
 
 RANGE = [0, 1]
 
@@ -104,9 +109,13 @@ def update_histogram(selectedData, figure):
     vertices = zip(selectedData['lassoPoints']['x'], selectedData['lassoPoints']['y'])
 
     path = Path( vertices )
+        
+    img_pil, anno_pil = trainset[0]
+
+    img_np = np.asarray(img_pil)
+    anno_np = np.asarray(anno_pil)
     
-    img_np = io.imread(image_path)
-    anno_np = io.imread(annotation_path)
+    
     height, width, _ = img_np.shape
     
     x, y = np.meshgrid( range(width), range(height-1, -1, -1))
@@ -118,7 +127,7 @@ def update_histogram(selectedData, figure):
     
     updated_anno = anno_np * mask
     
-    io.imsave('/home/daniil/frame005_anno.png', updated_anno)
+    #io.imsave('/home/daniil/frame005_anno.png', updated_anno)
     
     output_image = (img_np * np.expand_dims(updated_anno, 2) )
     
