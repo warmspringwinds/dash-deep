@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import base64
 import json
+import dash_table_experiments as dt
 
 import skimage.io as io
 
@@ -89,8 +90,14 @@ layout = html.Div([
             }
         ),
     
-    # Where we store the current image
-    html.Div("{}", id='image-annotation-container', style={'display': 'none'}),
+    dcc.Dropdown(
+                id='annotation-dropdown',
+                placeholder='Select a value',
+                options=[],
+                multi=False
+    ),
+    
+    html.Button('Refresh Table', id='annotation-button'),
     
     html.Div(className='row', children=[
         html.Div(InteractiveImage('annotation-graph', image_path), className='six columns'),
@@ -101,16 +108,41 @@ layout = html.Div([
 ])
 
 
+
+@app.callback(Output('annotation-dropdown', 'options'),
+              [Input('annotation-button', 'n_clicks')])
+def callback(n_clicks):
+
+    number_of_records = len(trainset)
+
+    table = []
+
+    for i in xrange(number_of_records):
+        
+        table.append({'label':'Sample #{}'.format(i), 'value': i})
+
+    return table
+
+
+@app.callback(Output('console', 'children'),
+              [Input('annotation-dropdown', 'value')])
+def callback(value):
+
+    return str(value)
+
+
 @app.callback(Output('annotation-graph', 'figure'),
-              [Input('annotation-graph', 'selectedData')],
+              [Input('annotation-graph', 'selectedData'),
+               Input('annotation-dropdown', 'value')],
               [State('annotation-graph', 'figure')])
-def update_histogram(selectedData, figure):
+def update_histogram(selectedData, value, figure):
     
-    vertices = zip(selectedData['lassoPoints']['x'], selectedData['lassoPoints']['y'])
+    vertices = zip(selectedData['lassoPoints']['x'],
+                   selectedData['lassoPoints']['y'])
 
     path = Path( vertices )
         
-    img_pil, anno_pil = trainset[0]
+    img_pil, anno_pil = trainset[value]
 
     img_np = np.asarray(img_pil)
     anno_np = np.asarray(anno_pil)
@@ -126,6 +158,12 @@ def update_histogram(selectedData, figure):
     mask = mask.reshape(height, width).astype(np.uint8)
     
     updated_anno = anno_np * mask
+    
+    # Convert the mask to one hot mask
+    
+    # update the respective one hot of a certain class
+    
+    # use __set_item__ to save the changes
     
     #io.imsave('/home/daniil/frame005_anno.png', updated_anno)
     
