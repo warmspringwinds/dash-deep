@@ -6,8 +6,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 import base64
 import json
-import dash_table_experiments as dt
-
 import skimage.io as io
 
 import matplotlib.pyplot as plt
@@ -15,9 +13,9 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 
 import numpy as np
+import json
 
 from dash_deep.utils import convert_numpy_to_base64_image_string, convert_base64_image_string_to_numpy
-
 
 sql_model = scripts_db_models[0]
 
@@ -38,6 +36,8 @@ def InteractiveImage(id, image_path):
     return dcc.Graph(
         id=id,
         figure={
+            # We need a dummy data points, otherwise the lasso
+            # won't work
             'data': [{'x': [0.5], 'y': [0.5] }],
             'layout': {
                 'xaxis': {
@@ -90,6 +90,10 @@ layout = html.Div([
             }
         ),
     
+    
+    html.Div(id='annotation-selection-previous-state', style={'display': 'none'}),
+    
+    
     dcc.Dropdown(
                 id='annotation-dropdown',
                 placeholder='Select a value',
@@ -103,8 +107,6 @@ layout = html.Div([
         html.Div(InteractiveImage('annotation-graph', image_path), className='six columns'),
     ]),
     
-    # Don't need but leave it for now
-    html.Pre(id='console')
 ])
 
 
@@ -114,7 +116,7 @@ layout = html.Div([
 def callback(n_clicks):
 
     number_of_records = len(trainset)
-
+    
     table = []
 
     for i in xrange(number_of_records):
@@ -124,40 +126,53 @@ def callback(n_clicks):
     return table
 
 
-@app.callback(Output('console', 'children'),
-              [Input('annotation-dropdown', 'value')])
-def callback(value):
-
-    return str(value)
+# We are tracking the previous state of the selection -- this is needed
+# to prevent an update that might be caused when we switch to a new
+# dataset sample but the selection values are still there -- that might
+# cause the update of a sample even though user never applied it to the
+# new image. So, if the selection is old, we don't perform an update on the
+# dataset
+@app.callback(Output('annotation-selection-previous-state', 'children'),
+              [Input('annotation-graph', 'selectedData')])
+def callback(new_value):
+    
+    selection_json_string = json.dumps(new_value)
+    
+    return selection_json_string 
 
 
 @app.callback(Output('annotation-graph', 'figure'),
               [Input('annotation-graph', 'selectedData'),
                Input('annotation-dropdown', 'value')],
-              [State('annotation-graph', 'figure')])
-def update_histogram(selectedData, value, figure):
+              [State('annotation-graph', 'figure'),
+               State('annotation-selection-previous-state', 'children')])
+def update_histogram(selectedData, value, figure, previous_selected_data_string):
     
-    vertices = zip(selectedData['lassoPoints']['x'],
-                   selectedData['lassoPoints']['y'])
-
-    path = Path( vertices )
-        
+    
     img_pil, anno_pil = trainset[value]
 
     img_np = np.asarray(img_pil)
     anno_np = np.asarray(anno_pil)
     
+    previous_selected_data = json.loads(previous_selected_data_string)
     
-    height, width, _ = img_np.shape
-    
-    x, y = np.meshgrid( range(width), range(height-1, -1, -1))
+    if previous_selected_data != selectedData:
+        
+        vertices = zip(selectedData['lassoPoints']['x'],
+                       selectedData['lassoPoints']['y'])
 
-    coors = np.hstack((x.reshape(-1, 1), y.reshape(-1,1)))
+        path = Path( vertices )
 
-    mask = (~ path.contains_points(coors))
-    mask = mask.reshape(height, width).astype(np.uint8)
-    
-    updated_anno = anno_np * mask
+        height, width, _ = img_np.shape
+
+        x, y = np.meshgrid( range(width), range(height-1, -1, -1))
+
+        coors = np.hstack((x.reshape(-1, 1), y.reshape(-1,1)))
+
+        mask = (~ path.contains_points(coors))
+        mask = mask.reshape(height, width).astype(np.uint8)
+
+        anno_np = anno_np * mask
     
     # Convert the mask to one hot mask
     
@@ -167,7 +182,7 @@ def update_histogram(selectedData, value, figure):
     
     #io.imsave('/home/daniil/frame005_anno.png', updated_anno)
     
-    output_image = (img_np * np.expand_dims(updated_anno, 2) )
+    output_image = (img_np * np.expand_dims(anno_np, 2) )
     
     final = convert_numpy_to_base64_image_string(output_image)
     
