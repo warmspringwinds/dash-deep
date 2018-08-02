@@ -165,6 +165,7 @@ annotation_class_select_radio_id_name = 'annotation-class-select-radio'
 annotation_refresh_button_id_name = 'annotation-refresh-button'
 delete_sample_button_id_name = 'delete-sample-button'
 annotation_graph_id_name = 'annotation-graph'
+add_new_sample_button_previous_state_id_name = 'add-new-sample-previous-n-clicks'
 
 
 layout = html.Div([
@@ -224,7 +225,7 @@ layout = html.Div([
              style={'display': 'none'}),
     html.Div(id=annotation_selection_previous_state_id_name,
              style={'display': 'none'}),
-    html.Div(id='add-new-sample-previous-n-clicks',
+    html.Div(id=add_new_sample_button_previous_state_id_name,
              style={'display': 'none'}),
     
     html.H3("View/Edit existing samples"),
@@ -255,7 +256,7 @@ layout = html.Div([
 
 
 
-@app.callback(Output('add-new-sample-previous-n-clicks', 'children'),
+@app.callback(Output(add_new_sample_button_previous_state_id_name, 'children'),
               [Input(add_new_sample_button_id_name, 'n_clicks')])
 def callback(new_value):
     
@@ -412,7 +413,7 @@ def callback(image_contents,
                State(annotation_upoad_id_name, 'contents'),
                State(annotation_dropdown_id_name, 'value'),
                State(global_crop_coordinates_id_name, 'children'),
-               State('add-new-sample-previous-n-clicks', 'children')])
+               State(add_new_sample_button_previous_state_id_name, 'children')])
 def callback(add_button_n_clicks,
              delete_button_n_clicks,
              image_contents,
