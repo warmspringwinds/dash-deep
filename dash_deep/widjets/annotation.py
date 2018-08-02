@@ -150,19 +150,29 @@ def crop_numpy_array_with_dash_rectangle_select(array_to_crop, dash_select_dict)
     return cropped_array
 
 
+
+
 image_upload_id_name = 'image-upload'
 annotation_upoad_id_name = 'annotation-upload'
 sample_preview_graph_id_name = 'sample-preview-graph'
-add_button_id_name = 'add-new-sample-button'
+add_new_sample_button_id_name = 'add-new-sample-button'
 dummy_output_id_name = 'dummy-output'
 global_crop_coordinates_id_name = 'global-crop-coordinates'
 crop_selection_previous_state_id_name = 'crop-selection-previous-state'
+annotation_selection_previous_state_id_name = 'annotation-selection-previous-state'
+annotation_dropdown_id_name = 'annotation-dropdown'
+annotation_class_select_radio_id_name = 'annotation-class-select-radio'
+annotation_refresh_button_id_name = 'annotation-refresh-button'
+delete_sample_button_id_name = 'delete-sample-button'
+annotation_graph_id_name = 'annotation-graph'
 
 
 layout = html.Div([
     html.H1("Dataset Management"),
     
     html.H3("Upload new sample"),
+    
+    create_image_graph_with_interactive_select(sample_preview_graph_id_name),
     
     dcc.Upload(
             id=image_upload_id_name,
@@ -200,9 +210,8 @@ layout = html.Div([
             }
         ),
     
-    create_image_graph_with_interactive_select(sample_preview_graph_id_name),
-    
-    html.Button('Upload new sample', id=add_button_id_name),
+    html.Button('Upload new sample',
+                id=add_new_sample_button_id_name),
     
     # Below is a number of elements
     # that are meant solely to store values
@@ -213,39 +222,51 @@ layout = html.Div([
              style={'display': 'none'}),
     html.Div(id=crop_selection_previous_state_id_name,
              style={'display': 'none'}),
-    html.Div(id='annotation-selection-previous-state',
+    html.Div(id=annotation_selection_previous_state_id_name,
+             style={'display': 'none'}),
+    html.Div(id='add-new-sample-previous-n-clicks',
              style={'display': 'none'}),
     
     html.H3("View/Edit existing samples"),
     
+    create_image_graph_with_interactive_select(annotation_graph_id_name,
+                                               select_mode='lasso'),
+    
     dcc.Dropdown(
-                id='annotation-dropdown',
+                id=annotation_dropdown_id_name,
                 placeholder='Select a value',
                 options=[],
                 multi=False
     ),
     
-    dcc.RadioItems(id='annotation-class-select-radio',
+    dcc.RadioItems(id=annotation_class_select_radio_id_name,
                    value=0,
                    options=[
                    {'label': 'Background', 'value': 0},
                    {'label': 'Foreground', 'value': 1}
                    ]),
     
-    html.Button('Refresh Table', id='annotation-button'),
+    html.Button('Refresh Table', id=annotation_refresh_button_id_name),
     
-    html.Button('Delete sample', id='delete-sample-button'),
-    
-    create_image_graph_with_interactive_select('annotation-graph', select_mode='lasso')
+    html.Button('Delete sample',
+                id=delete_sample_button_id_name)
     
 ])
+
+
+
+@app.callback(Output('add-new-sample-previous-n-clicks', 'children'),
+              [Input(add_new_sample_button_id_name, 'n_clicks')])
+def callback(new_value):
+    
+    return new_value
 
 # We are tracking the previous state of the selection -- here we need
 # it to be able to realize which input caused the next function to be called.
 # If the input argument of selection is equal to the old one, we decide
 # that the call of the function was caused by another input.
-@app.callback(Output('crop-selection-previous-state', 'children'),
-              [Input('sample-preview-graph', 'selectedData')])
+@app.callback(Output(crop_selection_previous_state_id_name, 'children'),
+              [Input(sample_preview_graph_id_name, 'selectedData')])
 def callback(new_value):
     
     selection_json_string = json.dumps(new_value)
@@ -253,11 +274,11 @@ def callback(new_value):
     return selection_json_string
 
 
-@app.callback(Output('global-crop-coordinates', 'children'),
-              [Input('sample-preview-graph', 'selectedData'),
-               Input('image-upload', 'contents')],
-              [State('global-crop-coordinates', 'children'),
-               State('crop-selection-previous-state', 'children')])
+@app.callback(Output(global_crop_coordinates_id_name, 'children'),
+              [Input(sample_preview_graph_id_name, 'selectedData'),
+               Input(image_upload_id_name, 'contents')],
+              [State(global_crop_coordinates_id_name, 'children'),
+               State(crop_selection_previous_state_id_name, 'children')])
 def callback(relative_crop_coordinates,
              image_contents,
              previous_global_crop_coordinates_string,
@@ -314,9 +335,9 @@ def callback(relative_crop_coordinates,
 
 # Callback that is responsible for deletion of a selected sample
 # of the dataset.
-@app.callback(Output('dummy-output', 'children'),
-              [Input('delete-sample-button', 'n_clicks')],
-              [State('annotation-dropdown', 'value')])
+@app.callback(Output(dummy_output_id_name, 'children'),
+              [Input(delete_sample_button_id_name, 'n_clicks')],
+              [State(annotation_dropdown_id_name, 'value')])
 def callback(n_clicks, drop_down_value):
     
     if drop_down_value is None:
@@ -330,15 +351,13 @@ def callback(n_clicks, drop_down_value):
     # that files of the selected sample were actually removed.
     sleep(1)
     
-    return
-    
-            
+    return    
 
 # This one cleans the annotation upload container once a new image
 # is loaded -- we want to erase previous annotation when we upload
 # next image.
-@app.callback(Output('annotation-upload', 'contents'),
-              [Input('image-upload', 'contents')])
+@app.callback(Output(annotation_upoad_id_name, 'contents'),
+              [Input(image_upload_id_name, 'contents')])
 def callback(image_contents):
               
     return None
@@ -346,11 +365,11 @@ def callback(image_contents):
 # Callback responsible for the preview feature -- 
 # display uploaded image and annotation and show the preview.
 # If no annotation was uploaded we initialize an empty one.
-@app.callback(Output('sample-preview-graph', 'figure'),
-              [Input('image-upload', 'contents'),
-               Input('annotation-upload', 'contents'),
-               Input('global-crop-coordinates', 'children')],
-              [State('sample-preview-graph', 'figure')])
+@app.callback(Output(sample_preview_graph_id_name, 'figure'),
+              [Input(image_upload_id_name, 'contents'),
+               Input(annotation_upoad_id_name, 'contents'),
+               Input(global_crop_coordinates_id_name, 'children')],
+              [State(sample_preview_graph_id_name, 'figure')])
 def callback(image_contents,
              annotation_contents,
              global_crop_coordinates_string,
@@ -386,18 +405,26 @@ def callback(image_contents,
 # Callback responsible for an addition of a new sample
 # into the selected dataset. It also automatically opens
 # up the added sample in the viewer.
-@app.callback(Output('annotation-dropdown', 'value'),
-              [Input('add-new-sample-button', 'n_clicks')],
-              [State('image-upload', 'contents'),
-               State('annotation-upload', 'contents'),
-               State('annotation-dropdown', 'value'),
-               State('global-crop-coordinates', 'children')])
-def callback(n_clicks,
+@app.callback(Output(annotation_dropdown_id_name, 'value'),
+              [Input(add_new_sample_button_id_name, 'n_clicks'),
+               Input(delete_sample_button_id_name, 'n_clicks')],
+              [State(image_upload_id_name, 'contents'),
+               State(annotation_upoad_id_name, 'contents'),
+               State(annotation_dropdown_id_name, 'value'),
+               State(global_crop_coordinates_id_name, 'children'),
+               State('add-new-sample-previous-n-clicks', 'children')])
+def callback(add_button_n_clicks,
+             delete_button_n_clicks,
              image_contents,
              annotation_contents,
              dropdown_previous_selection,
-             global_crop_coordinates_string):
+             global_crop_coordinates_string,
+             old_number_of_add_button_clicks_string):
     
+    if add_button_n_clicks == old_number_of_add_button_clicks_string:
+        
+        return -1
+        
     is_image_loaded = check_dash_upload_contents_for_image(image_contents)
     is_annotation_loaded = check_dash_upload_contents_for_image(annotation_contents)
     
@@ -429,10 +456,10 @@ def callback(n_clicks,
 
 # Callback that is responsible for refreshing of the samples
 # id list after addition/deletion/refresh buttons.
-@app.callback(Output('annotation-dropdown', 'options'),
-              [Input('annotation-button', 'n_clicks'),
-               Input('add-new-sample-button', 'n_clicks'),
-               Input('delete-sample-button', 'n_clicks')])
+@app.callback(Output(annotation_dropdown_id_name, 'options'),
+              [Input(annotation_refresh_button_id_name, 'n_clicks'),
+               Input(add_new_sample_button_id_name, 'n_clicks'),
+               Input(delete_sample_button_id_name, 'n_clicks')])
 def callback(n_clicks, n_clicks_1, n_clicks_2):
     
     # Small hack: since this function is called
@@ -461,8 +488,8 @@ def callback(n_clicks, n_clicks_1, n_clicks_2):
 # cause the update of a sample even though user never applied it to the
 # new image. So, if the selection is old, we don't perform an update on the
 # dataset
-@app.callback(Output('annotation-selection-previous-state', 'children'),
-              [Input('annotation-graph', 'selectedData')])
+@app.callback(Output(annotation_selection_previous_state_id_name, 'children'),
+              [Input(annotation_graph_id_name, 'selectedData')])
 def callback(new_value):
     
     selection_json_string = json.dumps(new_value)
@@ -473,17 +500,23 @@ def callback(new_value):
 # It loads the image and annotation file from the dataset, updates
 # annotation with the region specified by the user and commits those changes
 # onto the disk.
-@app.callback(Output('annotation-graph', 'figure'),
-              [Input('annotation-graph', 'selectedData'),
-               Input('annotation-dropdown', 'value')],
-              [State('annotation-graph', 'figure'),
-               State('annotation-selection-previous-state', 'children'),
-               State('annotation-class-select-radio', 'value')])
+@app.callback(Output(annotation_graph_id_name, 'figure'),
+              [Input(annotation_graph_id_name, 'selectedData'),
+               Input(annotation_dropdown_id_name, 'value')],
+              [State(annotation_graph_id_name, 'figure'),
+               State(annotation_selection_previous_state_id_name, 'children'),
+               State(annotation_class_select_radio_id_name, 'value')])
 def update_histogram(selected_data,
                      drop_down_value,
                      figure,
                      previous_selected_data_string,
                      class_select_mode):
+    
+    if drop_down_value == -1:
+        
+        output_image = np.ones((100, 100, 3), dtype=np.uint8) * 255
+        
+        return update_figure_with_new_image(figure, output_image)
     
     img_pil, anno_pil = trainset[drop_down_value]
 
