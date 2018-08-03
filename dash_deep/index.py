@@ -8,7 +8,6 @@ from dash_table_experiments import DataTable
 
 from dash_deep.widjets import gpu_utilization_monitor
 from dash_deep.widjets import tasks_manager
-from dash_deep.widjets import annotation
 
 from dash_deep.utils import generate_scripts_widjets_and_cli_interfaces
 
@@ -46,10 +45,6 @@ def display_page(pathname):
     elif pathname == '/tasks':
         
         return tasks_manager.layout
-    
-    elif pathname == '/annotation':
-        
-        return annotation.layout
     
     elif pathname in scripts_full_url_widjet_look_up_table:
         

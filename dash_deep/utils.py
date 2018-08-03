@@ -3,7 +3,8 @@ from dash_deep.cli.cli_factory import generate_script_input_form_cli_interface
 from dash_deep.widjets.widjets_factory import (generate_script_input_form_widjet,
                                                generate_script_plots_widjet,
                                                generate_script_inference_widjet,
-                                               generate_script_navigation_page)
+                                               generate_script_navigation_page,
+                                               generate_dataset_management_widjet)
 import os
 import re
 import base64
@@ -163,6 +164,7 @@ def generate_scripts_widjets_and_cli_interfaces(script_db_models):
         script_train_page_url = "/{}/train".format( script_name )
         script_plot_page_url = "/{}/plot".format( script_name )
         script_inference_page_url = "/{}/inference".format( script_name )
+        script_dataset_management_url = "/{}/dataset_management".format( script_name )
         
         index_page_nav_bar_content.append((script_title, script_main_page_url))
         
@@ -170,7 +172,8 @@ def generate_scripts_widjets_and_cli_interfaces(script_db_models):
                                             ('Tasks tracking', '/tasks'),
                                             ('Train', script_train_page_url),
                                             ('Plot', script_plot_page_url),
-                                            ('Inference', script_inference_page_url)]
+                                            ('Inference', script_inference_page_url),
+                                            ('Dataset Management', script_dataset_management_url)]
         
         script_main_page_widjet = generate_script_navigation_page(script_main_page_nav_bar_content,
                                                                   script_title)
@@ -185,6 +188,9 @@ def generate_scripts_widjets_and_cli_interfaces(script_db_models):
         
         plots_widjet = generate_script_plots_widjet(script_db_model)
         scripts_full_url_widjet_look_up_table[script_plot_page_url] = plots_widjet
+        
+        dataset_management_widjet = generate_dataset_management_widjet(script_db_model)
+        scripts_full_url_widjet_look_up_table[script_dataset_management_url] = dataset_management_widjet
     
     index_page = generate_script_navigation_page(index_page_nav_bar_content, 'Main')
         
