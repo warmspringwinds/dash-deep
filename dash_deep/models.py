@@ -69,6 +69,9 @@ class ImagenetClassification(BasicExperimentMixin, db.Model):
     
     title = 'Imagenet Classification'
     
+    datasets = {'train': None,
+                'valset': None}
+    
     actions = {'main': imagenet_classification_train_run}
     
     

@@ -7,6 +7,13 @@ import dash_html_components as html
 
 from dash_deep.widjets.widjets_factory import generate_dataset_management_widjet
 
-sql_model = scripts_db_models[1]
+#sql_model = scripts_db_models[1]
 
-layout = generate_dataset_management_widjet(sql_model)
+layouts = []
+
+for script_db_model in scripts_db_models:
+    
+    layouts.append(generate_dataset_management_widjet(script_db_model))
+    
+
+layout = layouts[0]
