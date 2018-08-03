@@ -43,6 +43,11 @@ from PIL import Image
 
 from sklearn.metrics import confusion_matrix
 
+from pytorch_segmentation_detection.datasets.simple_dataset import SimpleDataset
+
+simple_train_dataset = SimpleDataset(train=True)
+simple_val_dataset = SimpleDataset(train=False)
+
 def flatten_logits(logits, number_of_classes):
     """Flattens the logits batch except for the logits dimension"""
 
