@@ -5,6 +5,7 @@ A pure python web service that is capable of
 1. Creation and annotation of image segmentation datasets.
 2. Running training and inference jobs.
 3. Monitoring the progress of training jobs and related accuracy metrics.
+4. Monitoring and halting of running jobs.
 
 In other words, it is a pure python customizable version of [Nvidia DIGITS](https://github.com/NVIDIA/DIGITS) with
 a focus on image segmentation task.
