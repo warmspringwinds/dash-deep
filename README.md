@@ -16,7 +16,14 @@ So far supports only Python 2 -- porting to Python 3 is in progress.
 
 We have a support for simple web based image uploading and annotation.
 This can be used to create a new dataset, make your annotations and run the training code.
-So far the tool supports zooming in and out, magic lasso, rectangle selection and cropping.
+So far the tool supports:
+
+1. Zooming in and out
+2. Magic lasso
+3. Rectangle selection
+4. Cropping.
+
+See a simple example below:
 
 <p align="center">
   <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/gif_hair_demo.gif" width="40%" align="middle">
