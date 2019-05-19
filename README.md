@@ -1,11 +1,12 @@
 # Dash-deep
 
-A pure python web service that is capable of
+A pure python web service (based on [plotly/dash](https://github.com/plotly/dash)) that is capable of
 
 1. Creation, annotation and updating of image segmentation datasets.
 2. Running training and inference jobs.
 3. Monitoring the progress of training jobs and related accuracy metrics.
 4. Monitoring and halting of running jobs.
+5. GPU memory and utilization monitoring.
 
 In other words, it is a pure python customizable version of [Nvidia DIGITS](https://github.com/NVIDIA/DIGITS) with
 a focus on image segmentation task.
@@ -29,6 +30,14 @@ See a simple example below:
   <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/gif_hair_demo.gif" width="40%" align="middle">
 </p>
 
+## Training accuracy/loss monitoring
+
+We support real-time monitoring of training metrics which can be customized,
+but by default support validation accuracy and training loss.
+
+<p align="center">
+  <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/plot_demo.gif" width="40%" align="middle">
+</p>
 
 ## Running
 
