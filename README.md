@@ -14,6 +14,7 @@ a focus on image segmentation task.
 You can see a video of example usage [here](https://youtu.be/WO2udiuBhsI).
 
 So far supports only Python 2 -- porting to Python 3 is in progress.
+The project is under development and will most probably change a lot in a future.
 
 ## Image annotation
 
