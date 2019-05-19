@@ -11,6 +11,8 @@ A pure python web service (based on [plotly/dash](https://github.com/plotly/dash
 In other words, it is a pure python customizable version of [Nvidia DIGITS](https://github.com/NVIDIA/DIGITS) with
 a focus on image segmentation task.
 
+You can see a video of example usage [here](https://youtu.be/WO2udiuBhsI).
+
 So far supports only Python 2 -- porting to Python 3 is in progress.
 
 ## Image annotation
@@ -39,9 +41,9 @@ but by default support validation accuracy and training loss.
   <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/plot_demo.gif" width="40%" align="middle">
 </p>
 
-## Updating annotations of existing dataset
+## Updating existing dataset
 
-You can update saved dataset any time
+You can update saved dataset at any time:
 
 <p align="center">
   <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/gif_dataset_update_demo.gif" width="40%" align="middle">
