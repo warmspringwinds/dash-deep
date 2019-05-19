@@ -19,7 +19,7 @@ This can be used to create a new dataset, make your annotations and run the trai
 So far the tool supports zooming in and out, magic lasso, rectangle selection and cropping.
 
 <p align="center">
-  <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/hair_segm_demo.jpg" width="40%" align="middle">
+  <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/hair_segm_demo.gif" width="40%" align="middle">
 </p>
 
 
