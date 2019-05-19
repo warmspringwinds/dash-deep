@@ -39,6 +39,14 @@ but by default support validation accuracy and training loss.
   <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/plot_demo.gif" width="40%" align="middle">
 </p>
 
+## Updating annotations of existing dataset
+
+You can update saved dataset any time
+
+<p align="center">
+  <img src="https://github.com/warmspringwinds/dash-deep/blob/master/imgs/gif_update_dataset_demo.gif" width="40%" align="middle">
+</p>
+
 ## Running
 
 To start the server run:
